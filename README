@@ -1,0 +1,4 @@
+ActivityStats 
+Activity Stats is a bukkit plugin for minecraft that tracks and measure player activity (block breaking, block placing, chating, traveling, damaging entities); records the information to a MySQL, or SQLite database; and can pay players, or promote them based on their activity.
+
+Vault is a require dependancy for Activity Stats.
