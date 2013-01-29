@@ -1,0 +1,38 @@
+name: ActivityStats
+main: com.dwarfholm.braizhauler.activitystats.ActivityStats
+version: 0.0.130120
+depend: [Vault]
+commands:
+   activitystats:
+      description: Displays your activity statistics.
+      usage: /activitystats
+      permission: activitystats.view.self
+      permission-message: You lack the permission activitystats.view.self
+
+permissions:
+   activitystats.view.*:
+      description: Allows to view all information
+      children:
+         activitystats.view.own: true
+         activitystats.view.other: true
+         activitystats.view.list: true
+   activitystats.view.self:
+      description: Allows to view own activity with /activity
+      default: true
+   activitystats.view.other:
+      description: Allows to view activity of other players with /activity (name)
+      default: true
+   activitystats.notify.*:
+      descriptions: Sends all notifications
+      children:
+         activity.notify.activity: true
+         activity.notify.income: true
+   activitystats.notify.activity:
+      description: Sends regular notifications about current activity
+      default: true
+   activitystats.notify.income:
+      description: Sends notifications about income
+      default: true
+   activitystats.admin.*:
+      description: Allows admin stuff
+      default: op

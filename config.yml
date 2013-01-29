@@ -1,0 +1,58 @@
+locale:
+   language: en
+   country: US
+
+#interval is in minutes 
+interval: 15
+quota: 500
+
+block-break: 
+   multiplier: 5
+   max: 500
+block-place: 
+   multiplier: 5
+   max: 500
+blocks-traveled: 
+   multiplier: 1
+   max: 500
+chat-commands: 
+   multiplier: 1
+   max: 500
+damage-animal: 
+   multiplier: 1
+   max: 500
+damage-monster: 
+   multiplier: 1
+   max: 500
+damage-player: 
+   multiplier: 1
+   max: 500
+   
+database:
+   use-mysql: true
+   #You may ignore this section if use-mysql is false
+   #Plugin will not function without mysql currently
+   mysql:
+      #Usually hostename localhost port 3306
+      hostname: localhost
+      port: 3306
+     
+      #often root
+      username: dwarfholm 
+      password: '' 
+      database: dwarfholm
+      tableprefix: AS_
+      
+economy:
+   #valid modes - Off, Boolean, Percent
+
+   mode: Percent
+   
+   # if Boolean Mode
+   #    Min is amount received if did not reach activity level
+   #    Max is amount received if met or exceded activity level
+   # if Percent
+   #    Income = Min + (Max - Min) * (Activity / Quota <at most 1>)
+
+   min: 0.0
+   max: 2.0
