@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 
 
 public class ASMySql {
@@ -228,7 +227,6 @@ public class ASMySql {
 	public void updateRecordTable(ASPlayer player, String tableName) {
 		Connection connection = getSQLConnection();
 		PreparedStatement statement = null;
-		Timestamp curtime = getCurrentTime();
 		if(playerExists(player.getName()))	{
 			String query = "UPDATE `" + prefix + tableName + "` " +
 			"SET `curActivity` = ?, `curOnline` = ?, `lastActivity` = ?, `lastOnline` = ? " +
@@ -237,10 +235,22 @@ public class ASMySql {
 				
 				statement = connection.prepareStatement(query);
 				
-				statement.setInt(1, player.curWeek.getActivity());
-				statement.setInt(2, player.curWeek.getOnline());
-				statement.setInt(3, player.lastWeek.getActivity());
-				statement.setInt(4, player.lastWeek.getOnline());
+				if (tableName.equals(DAY_TABLE_NAME))	{
+					statement.setInt(1, player.curDay.getActivity());
+					statement.setInt(2, player.curDay.getOnline());
+					statement.setInt(3, player.lastDay.getActivity());
+					statement.setInt(4, player.lastDay.getOnline());	
+				} else if (tableName.equals(WEEK_TABLE_NAME))	{
+					statement.setInt(1, player.curWeek.getActivity());
+					statement.setInt(2, player.curWeek.getOnline());
+					statement.setInt(3, player.lastWeek.getActivity());
+					statement.setInt(4, player.lastWeek.getOnline());
+				} else if (tableName.equals(MONTH_TABLE_NAME))	{
+					statement.setInt(1, player.curMonth.getActivity());
+					statement.setInt(2, player.curMonth.getOnline());
+					statement.setInt(3, player.lastMonth.getActivity());
+					statement.setInt(4, player.lastMonth.getOnline());
+				}
 				
 				statement.setString(5, player.getName());
 				
