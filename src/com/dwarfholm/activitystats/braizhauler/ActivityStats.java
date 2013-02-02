@@ -50,35 +50,36 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public void onEnable() {
-		config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), CONFIG_FILE_NAME));
-		Configuration defaultConfig = YamlConfiguration.loadConfiguration(getClass().getResourceAsStream("/" + CONFIG_FILE_NAME));
-		config.setDefaults(defaultConfig);
-
-		ASLongData.setConfig(config);
-		
-		
+		loadConfig();
 		loadRollovers();
+
+		
 		
 		locale = new ASLocale(this);
 		locale.load(Locale.US);
+		vault = new Vault(this);
 		vault.connect();
 		
 		players = new ASData(this);
-		travelTimer = new ASTravelTimer(this);
-		travelTimer.start();
-		payTimer = new ASPaymentTimer(this);
-		payTimer.start();
+		ASLongData.setConfig(config);
 		
 		commands = new ASCommands(this);
-		getCommand("activitystats").setExecutor(commands);
+		commands.registerCommands();
+		
+		travelTimer = new ASTravelTimer(this);
+		payTimer = new ASPaymentTimer(this);
+		
+		travelTimer.start();
+		payTimer.start();
 	}
 	
 	public void onDisable() {
+		commands.unregisterCommands();
 		commands = null;
 
 		payTimer.stop();
-		payTimer = null;
 		travelTimer.stop();
+		payTimer = null;
 		travelTimer = null;
 		players = null;
 		
@@ -86,7 +87,11 @@ public class ActivityStats extends JavaPlugin {
 		locale = null;
 		config = null;
 	}
-	
+	public void loadConfig()	{
+		config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), CONFIG_FILE_NAME));
+		Configuration defaultConfig = YamlConfiguration.loadConfiguration( getClass().getResourceAsStream("/" + CONFIG_FILE_NAME) );
+		config.setDefaults(defaultConfig);
+	}
 	public void saveConfig()	{
 		try {
 			config.save(CONFIG_FILE_NAME);
@@ -155,10 +160,10 @@ public class ActivityStats extends JavaPlugin {
 	
 	private void loadRollovers()	{
 		rolloverdata = YamlConfiguration.loadConfiguration(new File(getDataFolder(), ROLLOVER_FILE_NAME));
-		lastSaveRollover = dateStringToDate(rolloverdata.getString("lastrollover.save", ""));
-		lastDayRollover = dateStringToDate(rolloverdata.getString("lastrollover.day", ""));
-		lastWeekRollover = dateStringToDate(rolloverdata.getString("lastrollover.week", ""));
-		lastMonthRollover = dateStringToDate(rolloverdata.getString("lastrollover.mont", ""));
+		lastSaveRollover = dateStringToDate(rolloverdata.getString("lastrollover.save", "October 30, 1982 10:48:00pm"));
+		lastDayRollover = dateStringToDate(rolloverdata.getString("lastrollover.day", "October 30, 1982 10:48:00pm"));
+		lastWeekRollover = dateStringToDate(rolloverdata.getString("lastrollover.week", "October 30, 1982 10:48:00pm"));
+		lastMonthRollover = dateStringToDate(rolloverdata.getString("lastrollover.mont", "October 30, 1982 10:48:00pm"));
 	}
 	
 	private void saveRollovers()	{
@@ -192,7 +197,7 @@ public class ActivityStats extends JavaPlugin {
 			amount = getBooleanPayment(player);
 		} else	{ 
 			return;
-		}		
+		}
 
 		msg(getServer().getPlayer(player.getName()), locale.getPaymentMessage(amount));
 		vault.econ.depositPlayer(player.getName() , amount);

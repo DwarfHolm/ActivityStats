@@ -11,8 +11,8 @@ public class ASTravelTimer implements Runnable{
 	private BukkitTask task;
 	
 	public ASTravelTimer(ActivityStats parent)	{
-		intervalInTicks = 1200; //ticks per secound * secounds per minute
 		plugin = parent;
+		intervalInTicks = 1200; //ticks per secound * secounds per minute
 	}
 	
 	public void start()	{

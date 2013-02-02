@@ -12,6 +12,14 @@ public class ASCommands implements CommandExecutor{
 		this.plugin = plugin;
 	}
 	
+	public void registerCommands() {
+		plugin.getCommand("activitystats").setExecutor(this);	
+	}
+
+	
+	public void unregisterCommands() {
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] arguments) {
 		if (command.getName().equalsIgnoreCase("activitystats"))	{
@@ -20,5 +28,6 @@ public class ASCommands implements CommandExecutor{
 		}
 		return false;
 	}
+
 
 }

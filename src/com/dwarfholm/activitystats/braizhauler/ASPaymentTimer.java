@@ -8,8 +8,8 @@ public class ASPaymentTimer implements Runnable{
 	private BukkitTask task;
 	
 	public ASPaymentTimer(ActivityStats parent)	{
-		intervalInTicks = 20 * 60 * plugin.config().getInt("interval"); //Ticks per Second * Seconds Per minute * Minutes 
 		plugin = parent;
+		intervalInTicks = 20 * 60 * plugin.config().getInt("interval"); //Ticks per Second * Seconds Per minute * Minutes 
 	}
 	
 	public void start()	{
