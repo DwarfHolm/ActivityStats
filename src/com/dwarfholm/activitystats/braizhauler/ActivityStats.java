@@ -92,7 +92,7 @@ public class ActivityStats extends JavaPlugin {
 		saveConfiguation();
 	}
 	private void saveConfiguation()	{
-		saveResource(CONFIG_FILE_NAME, false);
+		saveResource(CONFIG_FILE_NAME, true);
 	}
 	
 	public void loadPlayer(String name)	{	players.loadPlayer(name);	}
@@ -167,7 +167,7 @@ public class ActivityStats extends JavaPlugin {
 		rolloverdata.set("lastrollover.day", dateDateToString(lastDayRollover));
 		rolloverdata.set("lastrollover.week", dateDateToString(lastWeekRollover));
 		rolloverdata.set("lastrollover.month", dateDateToString(lastMonthRollover));
-		saveResource(ROLLOVER_FILE_NAME, false);
+		saveResource(ROLLOVER_FILE_NAME, true);
 	}
 	
 	private String dateDateToString(Date time)	{
