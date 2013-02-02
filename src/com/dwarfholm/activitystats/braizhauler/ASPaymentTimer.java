@@ -13,7 +13,7 @@ public class ASPaymentTimer implements Runnable{
 	}
 	
 	public void start()	{
-		task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this, intervalInTicks, intervalInTicks);
+		task = plugin.getServer().getScheduler().runTaskTimer(plugin, this, intervalInTicks, intervalInTicks);
 	}
 	
 	public void stop()	{
