@@ -1,5 +1,5 @@
 name: ActivityStats
-main: com.dwarfholm.braizhauler.activitystats.ActivityStats
+main: com.dwarfholm.activitystats.braizhauler.ActivityStats
 version: 0.0.130120
 depend: [Vault]
 commands:
