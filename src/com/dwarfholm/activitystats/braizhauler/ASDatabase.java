@@ -3,10 +3,6 @@ package com.dwarfholm.activitystats.braizhauler;
 
 import org.bukkit.scheduler.BukkitScheduler;
 
-enum TableType	{
-	PLAYER, DAY, WEEK, MONTH
-}
-
 public class ASDatabase {
 	private ActivityStats plugin;
 	private BukkitScheduler scheduler;
