@@ -22,7 +22,6 @@ public class ASTravelTimer implements Runnable{
 	public void stop()	{
 		task.cancel();
 	}
-
 	
 	public void run() {
 		for (Player player: plugin.getServer().getOnlinePlayers() )
