@@ -12,6 +12,10 @@ public class ASPlayer {
 	public ASShortData lastMonth;
 	public ASShortData total;
 	
+	public ASPlayer(String name)	{
+		this.name=name;
+	}
+	
 	public void rolloverPeriod()	{
 		curDay.add(lastPeriod);
 		curWeek.add(lastPeriod);

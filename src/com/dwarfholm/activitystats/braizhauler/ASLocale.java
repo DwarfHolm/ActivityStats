@@ -29,4 +29,8 @@ public class ASLocale {
 		plugin = null;
 		locale = null;
 	}
+
+	public String getPaymentMessage(double amount) {
+		return String.format(locale.getString("payment-message"), plugin.econ().format(amount));
+	}
 }

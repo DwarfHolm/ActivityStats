@@ -3,6 +3,9 @@ package com.dwarfholm.activitystats.braizhauler;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -19,7 +22,24 @@ public class ActivityStats extends JavaPlugin {
 	private Vault vault;
 	private ASLocale locale;
 	private Logger log;
+	private ASData players;
+
+
+	YamlConfiguration rolloverdata;
+
+	private Date lastSaveRollover;
+	private Date lastDayRollover;
+	private Date lastWeekRollover;
+	private Date lastMonthRollover;
+	
+	private final long MILLIS_PER_MINUTE = 60000;
+	private final long MILLIS_PER_DAY = 86400000;
+	private final long MILLIS_PER_WEEK = 7 * MILLIS_PER_DAY;
+	private final long MILLIS_PER_MONTH = 30 * MILLIS_PER_DAY;
+	
+	private ASTravelTimer travelTimer;
 	private final String CONFIG_FILE_NAME = "config.yml";
+	private final String ROLLOVER_FILE_NAME = "data.yml";
 	private final String LOG_NAME = "ActivityStats";
 	private final String CONSOLE = "console";
 	
@@ -31,14 +51,26 @@ public class ActivityStats extends JavaPlugin {
 		config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), CONFIG_FILE_NAME));
 		Configuration defaultConfig = YamlConfiguration.loadConfiguration(getClass().getResourceAsStream("/" + CONFIG_FILE_NAME));
 		config.setDefaults(defaultConfig);
+
+		ASLongData.setConfig(config);
+		
+		
+		loadRollovers();
 		
 		locale = new ASLocale(this);
 		locale.load(Locale.US);
-		
 		vault.connect();
+		
+		players = new ASData(this);
+		travelTimer = new ASTravelTimer(this);
+		travelTimer.start();
 	}
 	
 	public void onDisable() {
+		travelTimer.stop();
+		travelTimer = null;
+		players = null;
+		
 		vault.disconnect();
 		locale = null;
 		config = null;
@@ -50,6 +82,13 @@ public class ActivityStats extends JavaPlugin {
 		} catch (IOException e) {
 			severe(e.getMessage());
 		}
+	}
+	
+	public void loadPlayer(String name)	{	players.loadPlayer(name);	}
+	public void savePlayer(String name)	{	players.savePlayer(name);	}
+	public ASData getASPlayersList()	{	return players;	}
+	public ASPlayer getASPlayer(String name)	{
+		return players.getPlayer(name);
 	}
 	
 	public YamlConfiguration config()	{	return config;	}
@@ -65,6 +104,94 @@ public class ActivityStats extends JavaPlugin {
 			csSender = getServer().getPlayer(sSender);
 		}
 		msg (csSender, msg);
+	}
+	
+
+	public boolean SaveRolloverDue()	{
+		return ( System.currentTimeMillis() - lastSaveRollover.getTime() ) > config.getInt("interval") * MILLIS_PER_MINUTE;
+	}
+	public boolean DayRolloverDue()	{
+		return ( System.currentTimeMillis() - lastDayRollover.getTime() ) > MILLIS_PER_DAY;
+	}
+	public boolean WeekRolloverDue()	{
+		return ( System.currentTimeMillis() - lastWeekRollover.getTime() ) > MILLIS_PER_WEEK;
+	}
+	public boolean MonthRolloverDue()	{
+		return ( System.currentTimeMillis() - lastMonthRollover.getTime() ) > MILLIS_PER_MONTH;
+	}
+	
+	public Date getLastSaveRollover()	{	return lastSaveRollover;	}
+	public Date getLastDayRollover()	{	return lastDayRollover;	}
+	public Date getLastWeekRollover()	{	return lastWeekRollover;	}
+	public Date getLastMonthRollover()	{	return lastMonthRollover;	}
+	
+	public void rolledoverSave()	{
+		lastSaveRollover.setTime(System.currentTimeMillis());
+		saveRollovers();
+	}
+	public void rolledoverDay()	{
+		lastDayRollover.setTime(System.currentTimeMillis());
+		saveRollovers();
+	}
+	public void rolledoverWeek()	{
+		lastWeekRollover.setTime(System.currentTimeMillis());
+		saveRollovers();
+	}
+	public void rolledoverMonth()	{
+		lastMonthRollover.setTime(System.currentTimeMillis());
+		saveRollovers();
+	}
+	
+	private void loadRollovers()	{
+		rolloverdata = YamlConfiguration.loadConfiguration(new File(getDataFolder(), ROLLOVER_FILE_NAME));
+		lastSaveRollover = dateStringToDate(rolloverdata.getString("lastrollover.save", ""));
+		lastDayRollover = dateStringToDate(rolloverdata.getString("lastrollover.day", ""));
+		lastWeekRollover = dateStringToDate(rolloverdata.getString("lastrollover.week", ""));
+		lastMonthRollover = dateStringToDate(rolloverdata.getString("lastrollover.mont", ""));
+	}
+	
+	private void saveRollovers()	{
+		rolloverdata.set("lastrollover.save", dateDateToString(lastSaveRollover));
+		rolloverdata.set("lastrollover.day", dateDateToString(lastDayRollover));
+		rolloverdata.set("lastrollover.week", dateDateToString(lastWeekRollover));
+		rolloverdata.set("lastrollover.month", dateDateToString(lastMonthRollover));
+		saveResource(ROLLOVER_FILE_NAME, false);
+	}
+	
+	private String dateDateToString(Date time)	{
+		return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(time);
+	}
+	
+	private Date dateStringToDate(String date)	{
+		Date time = null;
+		try {
+			time = DateFormat.getDateInstance().parse(date);
+		} catch (ParseException e) {
+			severe("Date Parse Error");
+		}
+		return time;
+	}
+	
+	public void payPlayer(ASPlayer player)	{
+		double amount;
+		String payMode = config.getString("economy.mode");
+		if (payMode.equalsIgnoreCase("Percent"))	{
+			amount = getPercentPayment(player);
+		} else if (payMode.equalsIgnoreCase("Boolean"))	{
+			amount = getBooleanPayment(player);
+		} else	{ 
+			return;
+		}		
+
+		msg(getServer().getPlayer(player.getName()), locale.getPaymentMessage(amount));
+		vault.econ.depositPlayer(player.getName() , amount);
+	}
+	
+	private double getPercentPayment(ASPlayer player)	{
+		return (double)player.curPeriod.getActivity() / config.getDouble("quota") ;
+	}
+	private double getBooleanPayment(ASPlayer player)	{
+		return (double)player.curPeriod.getActivity() / config.getDouble("quota") ;
 	}
 	
 	public void msg(CommandSender sender, String msg)	{	sender.sendMessage(msg);	}

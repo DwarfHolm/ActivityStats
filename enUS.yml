@@ -1,0 +1,2 @@
+payment-message: "You've been payed ?"
+#       # ? replaced with formated amount at run time;
