@@ -19,8 +19,11 @@ public class ASData {
 	}
 	
 	public void payAll() {
-		for (ASPlayer player:playerlist.values())
+		plugin.info("Paying all Players");
+		for (ASPlayer player:playerlist.values())	{
+			plugin.info(player.getName());
 			plugin.payPlayer(player);
+		}
 		if( plugin.DayRolloverDue())
 			rolloverDay();
 		if( plugin.WeekRolloverDue())

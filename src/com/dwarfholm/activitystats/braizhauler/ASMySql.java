@@ -71,23 +71,31 @@ public class ASMySql {
 	
 	private boolean tableExists(String tableName)	{
 		boolean exists = false;
-		try {
-			Connection connection = getSQLConnection();
-
-			PreparedStatement statement = connection.prepareStatement("show tables like '" + tableName + "'");
-			ResultSet result = statement.executeQuery();
-
-			result.last();
-			if (result.getRow() != 0) 
-				exists = true;			
-			result.close();
-			statement.close();
-			connection.close();
-
-		} catch (SQLException e) {
-			printStackError("MySQL Table Error Error", e);
-		}
-		return exists;
+		boolean created = false;
+		do	{
+			try {
+				Connection connection = getSQLConnection();
+	
+				PreparedStatement statement = connection.prepareStatement("show tables like '" + tableName + "'");
+				ResultSet result = statement.executeQuery();
+	
+				result.last();
+				if (result.getRow() != 0) 
+					exists = true;			
+				result.close();
+				statement.close();
+				connection.close();
+	
+			} catch (SQLException e) {
+				printStackError("MySQL Table Error Error", e);
+			}
+			if (!exists && !created)	{
+				createTables();
+				created=true;
+			}
+		} while (!exists && created);
+		
+		return tableExists(tableName);
 	}
    
 	public void createTables() {
