@@ -17,6 +17,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public class ASListener implements Listener {
 	ActivityStats plugin;
 	
+	
+	
 	public ASListener(ActivityStats parent)	{
 		plugin = parent;
 	}

@@ -13,7 +13,6 @@ public class ASData {
 		database = new ASDatabase(plugin);
 	}
 	
-	
 	public void saveAll()	{
 		for (ASPlayer player:playerlist.values())
 			database.updatePlayer(player);

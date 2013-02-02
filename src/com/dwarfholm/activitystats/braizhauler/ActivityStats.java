@@ -23,7 +23,7 @@ public class ActivityStats extends JavaPlugin {
 	private ASLocale locale;
 	private Logger log;
 	private ASData players;
-
+	private ASCommands commands;
 
 	YamlConfiguration rolloverdata;
 
@@ -38,6 +38,8 @@ public class ActivityStats extends JavaPlugin {
 	private final long MILLIS_PER_MONTH = 30 * MILLIS_PER_DAY;
 	
 	private ASTravelTimer travelTimer;
+	private ASPaymentTimer payTimer;
+	
 	private final String CONFIG_FILE_NAME = "config.yml";
 	private final String ROLLOVER_FILE_NAME = "data.yml";
 	private final String LOG_NAME = "ActivityStats";
@@ -64,9 +66,18 @@ public class ActivityStats extends JavaPlugin {
 		players = new ASData(this);
 		travelTimer = new ASTravelTimer(this);
 		travelTimer.start();
+		payTimer = new ASPaymentTimer(this);
+		payTimer.start();
+		
+		commands = new ASCommands(this);
+		getCommand("activitystats").setExecutor(commands);
 	}
 	
 	public void onDisable() {
+		commands = null;
+
+		payTimer.stop();
+		payTimer = null;
 		travelTimer.stop();
 		travelTimer = null;
 		players = null;
