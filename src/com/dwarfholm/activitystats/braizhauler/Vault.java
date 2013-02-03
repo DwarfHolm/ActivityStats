@@ -17,7 +17,7 @@ public class Vault {
 
     public void connect() {
         if (!setupEconomy() ) {
-            plugin.severe("[%s] - Disabled due to no Vault dependency found!");
+            plugin.severe("Disabled due to no Vault dependency found!");
             plugin.getServer().getPluginManager().disablePlugin(plugin);
             return;
         }

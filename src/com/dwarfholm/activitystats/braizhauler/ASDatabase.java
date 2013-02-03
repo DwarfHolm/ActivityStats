@@ -11,8 +11,10 @@ public class ASDatabase {
 	public ASDatabase (ActivityStats plugin)	{
 		this.plugin = plugin;
 		this.scheduler = plugin.getServer().getScheduler();
-
+		
 		mySQL = new ASMySql(plugin);
+
+		createTables();
 	}
 	
 	public void createTables()	{

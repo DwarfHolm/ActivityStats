@@ -19,6 +19,7 @@ public class ASCommands implements CommandExecutor{
 
 	
 	public void unregisterCommands() {
+		plugin.getCommand("activitystats").setExecutor(null);
 	}
 	
 	@Override

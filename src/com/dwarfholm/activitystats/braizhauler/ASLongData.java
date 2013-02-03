@@ -106,7 +106,9 @@ public class ASLongData extends ASShortData {
 		calculateTravel(newLoc, newLoc);
 	}
 	public void calculateTravel(Location from, Location to) {
-		double dist = curLoc.distance(from);
+		double dist = 0;
+		if (curLoc!=null) 
+			dist = curLoc.distance(from);
 		travel((int)(dist * config.getInt("blocks-traveled.multiplier")));
 		curLoc = to;
 	}

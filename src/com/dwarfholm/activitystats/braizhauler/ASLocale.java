@@ -23,7 +23,7 @@ public class ASLocale {
 		locale = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), language.getLanguage() + language.getCountry() + ".yml"));
 		Configuration defaultLocale = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/enUS.yml"));
 		locale.setDefaults(defaultLocale);
-		plugin.saveResource(language.getLanguage() + language.getCountry(), true);
+		plugin.saveResource(language.getLanguage() + language.getCountry() + ".yml", true);
 		return this;
 	}
 

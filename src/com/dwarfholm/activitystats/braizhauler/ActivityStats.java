@@ -23,7 +23,8 @@ public class ActivityStats extends JavaPlugin {
 	private Logger log;
 	private ASData players;
 	private ASCommands commands;
-
+	private ASListener listener;
+	
 	YamlConfiguration rolloverdata;
 
 	private Date lastPeriodRollover;
@@ -43,46 +44,58 @@ public class ActivityStats extends JavaPlugin {
 	private final String ROLLOVER_FILE_NAME = "data.yml";
 	private final String LOG_NAME = "ActivityStats";
 	private final String CONSOLE = "console";
+
 	
-	public ActivityStats()	{
+	public void onLoad()	{
 		log = Logger.getLogger(LOG_NAME);
-	}
-	
-	public void onEnable() {
+		
 		loadConfiguation();
 		loadRollovers();
-
+		
 		locale = new ASLocale(this);
 		locale.load(Locale.US);
 		vault = new Vault(this);
-		vault.connect();
+		
 		
 		players = new ASData(this);
 		ASLongData.setConfig(config);
 		
 		commands = new ASCommands(this);
-		commands.registerCommands();
+		listener = new ASListener(this);
 		
 		travelTimer = new ASTravelTimer(this);
 		payTimer = new ASPaymentTimer(this);
+	}
+	
+	public void onEnable() {
+		loadConfiguation();
+		loadRollovers();
+		vault.connect();
 		
+		commands.registerCommands();
+		listener.register();
 		travelTimer.start();
 		payTimer.start();
 	}
 	
 	public void onDisable() {
+		listener.unregister();
 		commands.unregisterCommands();
 		commands = null;
 
 		payTimer.stop();
 		travelTimer.stop();
+		
 		payTimer = null;
 		travelTimer = null;
+		
 		players = null;
+		locale = null;
 		
 		vault.disconnect();
-		locale = null;
 		config = null;
+		
+		
 	}
 	
 	public void loadConfiguation()	{
