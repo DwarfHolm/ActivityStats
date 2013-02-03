@@ -10,6 +10,7 @@ public class ASData {
 	
 	public ASData(ActivityStats plugin)	{
 		this.plugin = plugin;
+		playerlist = new HashMap<String, ASPlayer>();
 		database = new ASDatabase(plugin);
 	}
 	
@@ -18,20 +19,28 @@ public class ASData {
 			database.updatePlayer(player);
 	}
 	
-	public void payAll() {
-		plugin.info("Paying all Players");
-		for (ASPlayer player:playerlist.values())	{
-			plugin.info(player.getName());
-			plugin.payPlayer(player);
+	public void recordOnline() {
+		for (ASPlayer player:playerlist.values())
+			if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
+				player.curPeriod.addOnline();
+		if( plugin.PeriodRolloverDue())	{
+			plugin.info("Paying all Players");
+			for (ASPlayer player:playerlist.values())	{
+				plugin.info(player.getName());
+				plugin.payPlayer(player);
+			}
+			if( plugin.DayRolloverDue())
+				rolloverDay();
+			if( plugin.WeekRolloverDue())
+				rolloverWeek();
+			if( plugin.MonthRolloverDue())
+				rolloverMonth();
+			rolloverPeriod();
+			for (ASPlayer player:playerlist.values())
+				if ( !plugin.getServer().getPlayer(player.getName()).isOnline() )
+					playerlist.remove(player.getName());
+			saveAll();
 		}
-		if( plugin.DayRolloverDue())
-			rolloverDay();
-		if( plugin.WeekRolloverDue())
-			rolloverWeek();
-		if( plugin.MonthRolloverDue())
-			rolloverMonth();
-		rolloverPeriod();
-		saveAll();
 	}
 	
 	public void loadPlayer(String player)	{
@@ -62,7 +71,7 @@ public class ASData {
 		for(String player: playerlist.keySet())	{
 			playerlist.get(player).rolloverPeriod();
 		}
-		plugin.rolledoverSave();
+		plugin.rolledoverPeriod();
 	}
 	public void rolloverDay()	{
 		for(String player: playerlist.keySet())

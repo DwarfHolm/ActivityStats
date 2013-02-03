@@ -42,4 +42,7 @@ public class ASPlayer {
 	public String getName()	{
 		return name;
 	}
+	public int getActivity()	{
+		return curPeriod.activity;
+	}
 }

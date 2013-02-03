@@ -95,7 +95,7 @@ public class ASLongData extends ASShortData {
 			calculateActivity();
 		}
 	}
-	public void addOnline(int max)	{
+	public void addOnline()	{
 		online += 1;
 	}	
 	private void calculateActivity()	{

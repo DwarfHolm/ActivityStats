@@ -4,7 +4,7 @@ locale:
 
 #interval is in minutes 
 interval: 15
-quota: 500
+quota: 500 #number of actions per interval, important for economy
 
 block-break: 
    multiplier: 5
@@ -49,10 +49,12 @@ economy:
    mode: Percent
    
    # if Boolean Mode
-   #    Min is amount received if did not reach activity level
-   #    Max is amount received if met or exceded activity level
+   #    Min is amount received if did not reach activity level quota
+   #    Max is amount received if met or exceded activity level quota
    # if Percent
    #    Income = Min + (Max - Min) * (Activity / Quota <at most 1>)
+   #   -or less accuatly-
+   #    Income = %Activity of Maximum 
 
    min: 0.0
    max: 2.0

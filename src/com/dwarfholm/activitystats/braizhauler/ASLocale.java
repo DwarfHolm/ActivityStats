@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 public class ASLocale {
 	private ActivityStats plugin;
@@ -22,6 +23,7 @@ public class ASLocale {
 		locale = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), language.getLanguage() + language.getCountry() + ".yml"));
 		Configuration defaultLocale = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/enUS.yml"));
 		locale.setDefaults(defaultLocale);
+		plugin.saveResource(language.getLanguage() + language.getCountry(), true);
 		return this;
 	}
 
@@ -31,6 +33,11 @@ public class ASLocale {
 	}
 
 	public String getPaymentMessage(double amount) {
-		return String.format(locale.getString("payment-message"), plugin.econ().format(amount));
+		return String.format(locale.getString("message.payment"), plugin.econ().format(amount));
+	}
+
+	public String getActivityReportMessage(Player target) {
+		ASPlayer tardata = plugin.getASPlayer(target.getName());
+		return String.format(locale.getString("message.activity-report"), plugin.getActivityPercent(tardata) );
 	}
 }

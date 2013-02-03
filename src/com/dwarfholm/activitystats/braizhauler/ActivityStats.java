@@ -26,7 +26,7 @@ public class ActivityStats extends JavaPlugin {
 
 	YamlConfiguration rolloverdata;
 
-	private Date lastSaveRollover;
+	private Date lastPeriodRollover;
 	private Date lastDayRollover;
 	private Date lastWeekRollover;
 	private Date lastMonthRollover;
@@ -102,6 +102,10 @@ public class ActivityStats extends JavaPlugin {
 		return players.getPlayer(name);
 	}
 	
+	public ASLocale getLocalization()	{
+		return locale;
+	}
+	
 	public YamlConfiguration config()	{	return config;	}
 	public Economy econ()	{	return vault.econ;	}
 	public Permission perms()	{	return vault.perms;	}
@@ -118,8 +122,8 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 
-	public boolean SaveRolloverDue()	{
-		return ( System.currentTimeMillis() - lastSaveRollover.getTime() ) > config.getInt("interval") * MILLIS_PER_MINUTE;
+	public boolean PeriodRolloverDue()	{
+		return ( System.currentTimeMillis() - lastPeriodRollover.getTime() ) > config.getInt("interval") * MILLIS_PER_MINUTE;
 	}
 	public boolean DayRolloverDue()	{
 		return ( System.currentTimeMillis() - lastDayRollover.getTime() ) > MILLIS_PER_DAY;
@@ -131,13 +135,13 @@ public class ActivityStats extends JavaPlugin {
 		return ( System.currentTimeMillis() - lastMonthRollover.getTime() ) > MILLIS_PER_MONTH;
 	}
 	
-	public Date getLastSaveRollover()	{	return lastSaveRollover;	}
+	public Date getLastPeriodRollover()	{	return lastPeriodRollover;	}
 	public Date getLastDayRollover()	{	return lastDayRollover;	}
 	public Date getLastWeekRollover()	{	return lastWeekRollover;	}
 	public Date getLastMonthRollover()	{	return lastMonthRollover;	}
 	
-	public void rolledoverSave()	{
-		lastSaveRollover.setTime(System.currentTimeMillis());
+	public void rolledoverPeriod()	{
+		lastPeriodRollover.setTime(System.currentTimeMillis());
 		saveRollovers();
 	}
 	public void rolledoverDay()	{
@@ -155,7 +159,7 @@ public class ActivityStats extends JavaPlugin {
 	
 	private void loadRollovers()	{
 		rolloverdata = YamlConfiguration.loadConfiguration(new File(getDataFolder(), ROLLOVER_FILE_NAME));
-		lastSaveRollover = dateStringToDate(rolloverdata.getString("lastrollover.save", "October 30, 1982 10:48:00pm"));
+		lastPeriodRollover = dateStringToDate(rolloverdata.getString("lastrollover.period", "October 30, 1982 10:48:00pm"));
 		lastDayRollover = dateStringToDate(rolloverdata.getString("lastrollover.day", "October 30, 1982 10:48:00pm"));
 		lastWeekRollover = dateStringToDate(rolloverdata.getString("lastrollover.week", "October 30, 1982 10:48:00pm"));
 		lastMonthRollover = dateStringToDate(rolloverdata.getString("lastrollover.month", "October 30, 1982 10:48:00pm"));
@@ -163,7 +167,7 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	private void saveRollovers()	{
-		rolloverdata.set("lastrollover.save", dateDateToString(lastSaveRollover));
+		rolloverdata.set("lastrollover.period", dateDateToString(lastPeriodRollover));
 		rolloverdata.set("lastrollover.day", dateDateToString(lastDayRollover));
 		rolloverdata.set("lastrollover.week", dateDateToString(lastWeekRollover));
 		rolloverdata.set("lastrollover.month", dateDateToString(lastMonthRollover));
@@ -198,11 +202,18 @@ public class ActivityStats extends JavaPlugin {
 		vault.econ.depositPlayer(player.getName() , amount);
 	}
 	
-	private double getPercentPayment(ASPlayer player)	{
-		return (double)player.curPeriod.getActivity() / config.getDouble("quota") ;
+	public double getPercentPayment(ASPlayer player)	{
+		return config.getDouble("economy.min") + ( config.getDouble("economy.max") - config.getDouble("economy.min") )* getActivityPercent(player) ;
 	}
-	private double getBooleanPayment(ASPlayer player)	{
-		return (double)player.curPeriod.getActivity() / config.getDouble("quota") ;
+	
+	public double getActivityPercent (ASPlayer player)	{
+		return Math.max( 1.0, (double)player.getActivity() / config.getDouble("quota"));
+	}
+	public double getBooleanPayment(ASPlayer player)	{
+		if((double)player.curPeriod.getActivity() > config.getDouble("quota"))
+			return config.getDouble("economy.max");
+		else
+			return config.getDouble("economy.min");
 	}
 	
 	public void msg(CommandSender sender, String msg)	{	sender.sendMessage(msg);	}

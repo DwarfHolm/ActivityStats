@@ -21,6 +21,6 @@ public class ASPaymentTimer implements Runnable{
 	}
 	
 	public void run() {
-		plugin.getASPlayersList().payAll();
+		plugin.getASPlayersList().recordOnline();
 	}
 }
