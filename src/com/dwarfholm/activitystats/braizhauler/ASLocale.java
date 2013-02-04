@@ -41,16 +41,15 @@ public class ASLocale {
 
 	private void loadLocale() {
 		msgPayment = locale.getString("message.payment").replaceAll("%","%%").replaceAll("\\?", "%s");
-		msgActivityReport = locale.getString("message.activity-report").replaceAll("%","%%").replaceAll("\\?", "%.2f");
+		msgActivityReport = locale.getString("message.activity-report").replaceAll("%","%%").replaceFirst("\\?", "%.2f").replaceFirst("\\?", "%s");
 	}
 
-	public String getPaymentMessage(double amount) {
-		plugin.info(msgPayment);
-		return String.format(msgPayment, plugin.econ().format(amount));
+	public String getPaymentMessage(double amount, double percent) {
+		percent = (float)(100 * percent);
+		return String.format(msgPayment, plugin.econ().format(amount),percent);
 	}
 
 	public String getActivityReportMessage(Player target) {
-		plugin.info(msgActivityReport);
 		ASPlayer tardata = plugin.getASPlayer(target.getName());
 		float percent = (float)(100 * plugin.getActivityPercent(tardata));
 		return String.format(msgActivityReport, percent);

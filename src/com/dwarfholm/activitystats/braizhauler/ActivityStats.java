@@ -230,6 +230,7 @@ public class ActivityStats extends JavaPlugin {
 	
 	public void payPlayer(ASPlayer player)	{
 		double amount;
+		double percent = getActivityPercent(player);
 		if (config.ecoModePercent())	{
 			amount = getPercentPayment(player);
 		} else if (config.ecoModeBoolean())	{
@@ -237,7 +238,7 @@ public class ActivityStats extends JavaPlugin {
 		} else	{ 
 			return;
 		}
-		msg(getServer().getPlayer(player.getName()), locale.getPaymentMessage(amount));
+		msg(getServer().getPlayer(player.getName()), locale.getPaymentMessage(amount, percent));
 		vault.econ.depositPlayer(player.getName() , amount);
 	}
 	

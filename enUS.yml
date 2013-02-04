@@ -1,5 +1,6 @@
 message:
-   payment: "You've been payed ?"
-   #       # ? replaced with formated amount at run time;
-   activity-report: "You are ?% active"
-   #       # ? replaced with activity% at run time;
+   payment: "You've been payed ? for ?% activity."
+   #       #First ? replaced with formated amount;
+   #       #Secound ? replaced with %activity
+   activity-report: "You are ?% active."
+   #       # ? replaced with activity%;
