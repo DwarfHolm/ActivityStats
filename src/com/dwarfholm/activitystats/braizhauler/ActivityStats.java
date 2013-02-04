@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
@@ -56,7 +55,6 @@ public class ActivityStats extends JavaPlugin {
 		
 		
 		locale = new ASLocale(this);
-		locale.load(Locale.US);
 		vault = new Vault(this);
 		
 		
@@ -76,9 +74,8 @@ public class ActivityStats extends JavaPlugin {
 		reloadRolloverData();
 		players.createDatabase();
 		
-		
+		locale.onEnable();
 		vault.connect();
-		
 		
 		commands.registerCommands();
 		listener.register();

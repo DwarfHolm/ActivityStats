@@ -1,43 +1,55 @@
 package com.dwarfholm.activitystats.braizhauler;
 
 import java.io.File;
-import java.util.Locale;
+import java.io.InputStream;
 
-import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class ASLocale {
 	private ActivityStats plugin;
 	private YamlConfiguration locale;
+	private File localeFile = null;
+
+	
+	String msgPayment, msgActivityReport;
 	
 	public ASLocale(ActivityStats plugin){
 		this.plugin = plugin;
 	}
 
-	public ASLocale load()	{
-		return load(new Locale("en", "US"));
+	public void onEnable() {
+		reloadLocale();
 	}
 	
-	public ASLocale load(Locale language)	{
-		locale = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), language.getLanguage() + language.getCountry() + ".yml"));
-		Configuration defaultLocale = YamlConfiguration.loadConfiguration(this.getClass().getResourceAsStream("/enUS.yml"));
-		locale.setDefaults(defaultLocale);
-		plugin.saveResource(language.getLanguage() + language.getCountry() + ".yml", true);
-		return this;
+	public void reloadLocale() 	{
+		 if (localeFile == null) {
+			 localeFile = new File(plugin.getDataFolder(), plugin.config().localeFileName);
+		 }
+	    locale = YamlConfiguration.loadConfiguration(localeFile);
+	 
+	    // Look for defaults in the jar
+	    InputStream defaultConfigStream = plugin.getResource("locale.yml");
+	    if (defaultConfigStream != null) {
+	        YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
+	        locale.setDefaults(defaultConfig);
+	    }
+	    loadLocale();
 	}
+	
 
-	public void unload() {
-		plugin = null;
-		locale = null;
+
+	private void loadLocale() {
+		msgPayment = locale.getString("message.payment");
+		msgActivityReport = locale.getString("message.activity-report");
 	}
 
 	public String getPaymentMessage(double amount) {
-		return String.format(locale.getString("message.payment"), plugin.econ().format(amount));
+		return String.format(msgPayment, plugin.econ().format(amount));
 	}
 
 	public String getActivityReportMessage(Player target) {
 		ASPlayer tardata = plugin.getASPlayer(target.getName());
-		return String.format(locale.getString("message.activity-report"), plugin.getActivityPercent(tardata) );
+		return String.format(msgActivityReport, plugin.getActivityPercent(tardata) );
 	}
 }
