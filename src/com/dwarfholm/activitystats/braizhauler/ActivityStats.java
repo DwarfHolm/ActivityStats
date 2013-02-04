@@ -34,10 +34,12 @@ public class ActivityStats extends JavaPlugin {
 	private Date lastWeekRollover;
 	private Date lastMonthRollover;
 	
+	private final long SHORT_PADDING = 500;
 	private final long MILLIS_PER_MINUTE = 60000;
-	private final long MILLIS_PER_DAY = 86400000;
-	private final long MILLIS_PER_WEEK = 7 * MILLIS_PER_DAY;
-	private final long MILLIS_PER_MONTH = 30 * MILLIS_PER_DAY;
+	private final long FULL_MILLIS_PER_DAY = 86400000;
+	private final long MILLIS_PER_DAY = FULL_MILLIS_PER_DAY - SHORT_PADDING;
+	private final long MILLIS_PER_WEEK = 7 * FULL_MILLIS_PER_DAY - SHORT_PADDING;
+	private final long MILLIS_PER_MONTH = 30 * FULL_MILLIS_PER_DAY - SHORT_PADDING;
 	
 	private ASTravelTimer travelTimer;
 	private ASPaymentTimer payTimer;
@@ -128,16 +130,16 @@ public class ActivityStats extends JavaPlugin {
 	}
 
 	public boolean PeriodRolloverDue()	{
-		return ( System.currentTimeMillis() - lastPeriodRollover.getTime() ) > config.iInterval * MILLIS_PER_MINUTE;
+		return ( System.currentTimeMillis() - lastPeriodRollover.getTime() ) >= config.iInterval * MILLIS_PER_MINUTE - SHORT_PADDING;
 	}
 	public boolean DayRolloverDue()	{
-		return ( System.currentTimeMillis() - lastDayRollover.getTime() ) > MILLIS_PER_DAY;
+		return ( System.currentTimeMillis() - lastDayRollover.getTime() ) >= MILLIS_PER_DAY;
 	}
 	public boolean WeekRolloverDue()	{
-		return ( System.currentTimeMillis() - lastWeekRollover.getTime() ) > MILLIS_PER_WEEK;
+		return ( System.currentTimeMillis() - lastWeekRollover.getTime() ) >= MILLIS_PER_WEEK;
 	}
 	public boolean MonthRolloverDue()	{
-		return ( System.currentTimeMillis() - lastMonthRollover.getTime() ) > MILLIS_PER_MONTH;
+		return ( System.currentTimeMillis() - lastMonthRollover.getTime() ) >= MILLIS_PER_MONTH;
 	}
 	
 	public Date getLastPeriodRollover()	{	return lastPeriodRollover;	}

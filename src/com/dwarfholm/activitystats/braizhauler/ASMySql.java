@@ -117,7 +117,7 @@ public class ASMySql {
 		Connection connection = getSQLConnection();
 		PreparedStatement statement = null;
 		try {
-			if ( tableExists(table) ) {
+			if ( !tableExists(table) ) {
 				plugin.info("Creating ActivityStats.Activity table.");
 				query = "CREATE TABLE `" + TableName(table) + "`" +
 						"(`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
@@ -239,16 +239,16 @@ public class ASMySql {
 	
 		String playerQuery = "INSERT INTO `" + TableName(TableType.PLAYER) + "` " +
 						"(`player`, `joined`, `lastonline`, `totalActivity`, `totalOnline`) " +
-						" VALUES (?, ?, ?, ?, ?, ?);";
+						" VALUES (?, ?, ?, ?, ?);";
 		String dayQuery = "INSERT INTO `" + TableName(TableType.DAY) + "` " +
 						"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
-						" VALUES (?, ?, ?, ?, ?, ?);";
+						" VALUES (?, ?, ?, ?, ?);";
 		String weekQuery = "INSERT INTO `" + TableName(TableType.WEEK) + "` " +
 						"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
-						" VALUES (?, ?, ?, ?, ?, ?);";
+						" VALUES (?, ?, ?, ?, ?);";
 		String monthQuery = "INSERT INTO `" + TableName(TableType.MONTH) + "` " +
 						"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
-						" VALUES (?, ?, ?, ?, ?, ?);";
+						" VALUES (?, ?, ?, ?, ?);";
 		try {
 		//Player Table
 			statement = connection.prepareStatement(playerQuery);
@@ -258,8 +258,6 @@ public class ASMySql {
 			statement.setTimestamp(3, curtime);
 			statement.setInt(4, player.total.getActivity());
 			statement.setInt(5, player.total.getOnline());
-			
-			plugin.info(playerQuery);
 			
 			statement.executeUpdate();
 			statement.close();
@@ -353,8 +351,8 @@ public class ASMySql {
 				statement = connection.prepareStatement(query);
 				
 				statement.setTimestamp(1, curtime);
-				statement.setInt(2, player.total.activity);
-				statement.setInt(3, player.total.online);
+				statement.setInt(2, player.total.getActivity());
+				statement.setInt(3, player.total.getOnline());
 				statement.setString(4, player.getName());
 				
 				statement.executeUpdate();
