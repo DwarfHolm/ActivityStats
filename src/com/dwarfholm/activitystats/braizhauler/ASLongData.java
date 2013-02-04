@@ -2,11 +2,10 @@ package com.dwarfholm.activitystats.braizhauler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 public class ASLongData extends ASShortData {
-	private static YamlConfiguration config = null;
+	private static ASConfig config = null;
 	private int blockBreak;
 	private int blockPlace;
 	private int traveled;
@@ -29,7 +28,7 @@ public class ASLongData extends ASShortData {
 		damPlayer = 0;
 		super.clear();
 	}
-	public static void setConfig(YamlConfiguration configuration){
+	public static void setConfig(ASConfig configuration){
 		config = configuration;
 	}
 	public boolean configSet()	{
@@ -54,44 +53,44 @@ public class ASLongData extends ASShortData {
 	}	
 	public void brokeBlock()	{
 		if(configSet())	{
-			blockBreak = Math.min(blockBreak + config.getInt("block-break.multiplier"), config.getInt("block-break.max"));
+			blockBreak = Math.min(blockBreak + config.iBreakMult, config.iBreakMax);
 			calculateActivity();
 		}
 	}	
 
 	public void placeBlock()	{
 		if(configSet())	{
-			blockPlace = Math.min(blockPlace + config.getInt("block-place.multiplier"), config.getInt("block-place.max"));;
+			blockPlace = Math.min(blockPlace + config.iPlaceMult, config.iPlaceMax);;
 			calculateActivity();
 		}
 	}	
 	public void travel(int add)	{
 		if(configSet())	{
-			traveled = Math.min(traveled + add, config.getInt("blocks-traveled.max"));
+			traveled = Math.min(traveled + add, config.iTravelMax);
 			calculateActivity();
 		}
 	}
 	public void chat()	{
 		if(configSet())	{
-			chat = Math.min(chat + config.getInt("chat-commands.multiplier"), config.getInt("chat-commands.max"));
+			chat = Math.min(chat + config.iChatMult, config.iChatMax);
 			calculateActivity();
 		}
 	}	
 	public void damageAnimal()	{
 		if(configSet())	{
-			damAnimal = Math.min(damAnimal + config.getInt("damage-animal.multiplier"), config.getInt("damage-animal.max"));
+			damAnimal = Math.min(damAnimal + config.iAnimalMult, config.iAnimalMax);
 			calculateActivity();
 		}
 	}	
 	public void damageMonster()	{
 		if(configSet())	{
-			damMonster = Math.min(damMonster + config.getInt("damage-monster.multiplier"), config.getInt("damage-monster.max"));
+			damMonster = Math.min(damMonster + config.iMonsterMult, config.iMonsterMax);
 			calculateActivity();
 		}
 	}
 	public void damagePlayer()	{
 		if(configSet())	{
-			damPlayer = Math.min(damPlayer + config.getInt("damage-player.multiplier"), config.getInt("damage-player.max"));
+			damPlayer = Math.min(damPlayer + config.iPlayerMult, config.iPlayerMax);
 			calculateActivity();
 		}
 	}
@@ -109,7 +108,7 @@ public class ASLongData extends ASShortData {
 		double dist = 0;
 		if (curLoc!=null) 
 			dist = curLoc.distance(from);
-		travel((int)(dist * config.getInt("blocks-traveled.multiplier")));
+		travel((int)(dist * config.iTravelMult));
 		curLoc = to;
 	}
 }

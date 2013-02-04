@@ -1,10 +1,10 @@
 locale:
-   language: en
-   country: US
+   filename: enUS.yml
 
 #interval is in minutes 
 interval: 15
-quota: 500 #number of actions per interval, important for economy
+quota: 500
+#number of actions per interval, important for economy
 
 block-break: 
    multiplier: 5

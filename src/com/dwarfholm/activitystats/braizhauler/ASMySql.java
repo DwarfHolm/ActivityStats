@@ -18,7 +18,7 @@ public class ASMySql {
 	}
 	
 	private String getPrefix()	{
-		prefix = plugin.config().getString("database.mysql.tableprefix");
+		prefix = plugin.config().sqlPrefix;
 		return prefix;
 	}
 	
@@ -40,16 +40,10 @@ public class ASMySql {
 		try {
 			Connection connection;
 			
-			if (plugin.config().getBoolean("database.use-mysql")) {
-				connection = DriverManager.getConnection("jdbc:mysql://" + plugin.config().getString("database.mysql.hostname") + 
-														":" + plugin.config().getString("database.mysql.port") +
-														"/" + plugin.config().getString("database.mysql.database"),
-														plugin.config().getString("database.mysql.username"),
-														plugin.config().getString("database.mysql.password"));
+			if (plugin.config().useMySQL) {
+				connection = DriverManager.getConnection(plugin.config().sqlURI, plugin.config().sqlUsername, plugin.config().sqlPassword);
 			} else {
-				connection = DriverManager.getConnection("jdbc:mysql://" + plugin.config().getString("database.mysql.hostname") + 
-														":" + plugin.config().getString("database.mysql.port") +
-														"/" + plugin.config().getString("database.mysql.database"));
+				connection = DriverManager.getConnection(plugin.config().sqlURI);
 			}
 			return connection;
 		} catch (SQLException e) {
@@ -60,9 +54,8 @@ public class ASMySql {
 	
 	private void printStackError(String error, SQLException e)	{
 		plugin.severe(error);
-		for (StackTraceElement trace: e.getStackTrace())	{
+		for (StackTraceElement trace: e.getStackTrace())
 			plugin.severe(trace.toString());
-		}
 	}
 	
 	private boolean tableExists(TableType table)	{
@@ -71,31 +64,23 @@ public class ASMySql {
 	
 	private boolean tableExists(String tableName)	{
 		boolean exists = false;
-		boolean created = false;
-		do	{
-			try {
-				Connection connection = getSQLConnection();
-	
-				PreparedStatement statement = connection.prepareStatement("show tables like '" + tableName + "'");
-				ResultSet result = statement.executeQuery();
-	
-				result.last();
-				if (result.getRow() != 0) 
-					exists = true;			
-				result.close();
-				statement.close();
-				connection.close();
-	
-			} catch (SQLException e) {
-				printStackError("MySQL Table Error Error", e);
-			}
-			if (!exists && !created)	{
-				createTables();
-				created=true;
-			}
-		} while (!exists && created);
-		
-		return tableExists(tableName);
+		try {
+			Connection connection = getSQLConnection();
+
+			PreparedStatement statement = connection.prepareStatement("show tables like '" + tableName + "'");
+			ResultSet result = statement.executeQuery();
+
+			result.last();
+			if (result.getRow() != 0) 
+				exists = true;			
+			result.close();
+			statement.close();
+			connection.close();
+
+		} catch (SQLException e) {
+			printStackError("MySQL Table Error Error", e);
+		}
+		return exists;
 	}
    
 	public void createTables() {

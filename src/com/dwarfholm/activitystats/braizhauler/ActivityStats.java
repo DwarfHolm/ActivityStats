@@ -2,6 +2,8 @@ package com.dwarfholm.activitystats.braizhauler;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -12,21 +14,22 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ActivityStats extends JavaPlugin {
-	private YamlConfiguration config;
 	private Vault vault;
 	private ASLocale locale;
 	private Logger log;
 	private ASData players;
 	private ASCommands commands;
 	private ASListener listener;
+	private ASConfig config;
 	
-	YamlConfiguration rolloverdata;
-
+	private FileConfiguration rolloverData = null;
+	private File rolloverDataFile = null;
+	
 	private Date lastPeriodRollover;
 	private Date lastDayRollover;
 	private Date lastWeekRollover;
@@ -40,7 +43,6 @@ public class ActivityStats extends JavaPlugin {
 	private ASTravelTimer travelTimer;
 	private ASPaymentTimer payTimer;
 	
-	private final String CONFIG_FILE_NAME = "config.yml";
 	private final String ROLLOVER_FILE_NAME = "data.yml";
 	private final String LOG_NAME = "ActivityStats";
 	private final String CONSOLE = "console";
@@ -48,9 +50,10 @@ public class ActivityStats extends JavaPlugin {
 	
 	public void onLoad()	{
 		log = Logger.getLogger(LOG_NAME);
+
+		rolloverDataFile = new File(getDataFolder(), "config.yml");
 		
-		loadConfiguation();
-		loadRollovers();
+		
 		
 		locale = new ASLocale(this);
 		locale.load(Locale.US);
@@ -68,45 +71,36 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public void onEnable() {
-		loadConfiguation();
-		loadRollovers();
+		
+		reloadConfig();
+		reloadRolloverData();
+		players.createDatabase();
+		
+		
 		vault.connect();
+		
 		
 		commands.registerCommands();
 		listener.register();
 		travelTimer.start();
 		payTimer.start();
+
+		info("ActivityStats Enabled");
 	}
 	
 	public void onDisable() {
 		listener.unregister();
 		commands.unregisterCommands();
-		commands = null;
 
 		payTimer.stop();
 		travelTimer.stop();
 		
-		payTimer = null;
-		travelTimer = null;
-		
-		players = null;
-		locale = null;
-		
 		vault.disconnect();
-		config = null;
-		
-		
 	}
 	
-	public void loadConfiguation()	{
-		config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), CONFIG_FILE_NAME));
-		Configuration defaultConfig = YamlConfiguration.loadConfiguration( getClass().getResourceAsStream("/" + CONFIG_FILE_NAME) );
-		config.setDefaults(defaultConfig);
-		saveConfiguation();
-	}
-	private void saveConfiguation()	{
-		saveResource(CONFIG_FILE_NAME, true);
-	}
+	
+	
+	
 	
 	public void loadPlayer(String name)	{	players.loadPlayer(name);	}
 	public void savePlayer(String name)	{	players.savePlayer(name);	}
@@ -118,8 +112,7 @@ public class ActivityStats extends JavaPlugin {
 	public ASLocale getLocalization()	{
 		return locale;
 	}
-	
-	public YamlConfiguration config()	{	return config;	}
+
 	public Economy econ()	{	return vault.econ;	}
 	public Permission perms()	{	return vault.perms;	}
 	
@@ -134,9 +127,12 @@ public class ActivityStats extends JavaPlugin {
 		msg (csSender, msg);
 	}
 	
+	public ASConfig config()	{
+		return config;
+	}
 
 	public boolean PeriodRolloverDue()	{
-		return ( System.currentTimeMillis() - lastPeriodRollover.getTime() ) > config.getInt("interval") * MILLIS_PER_MINUTE;
+		return ( System.currentTimeMillis() - lastPeriodRollover.getTime() ) > config.iInterval * MILLIS_PER_MINUTE;
 	}
 	public boolean DayRolloverDue()	{
 		return ( System.currentTimeMillis() - lastDayRollover.getTime() ) > MILLIS_PER_DAY;
@@ -170,28 +166,59 @@ public class ActivityStats extends JavaPlugin {
 		saveRollovers();
 	}
 	
-	private void loadRollovers()	{
-		rolloverdata = YamlConfiguration.loadConfiguration(new File(getDataFolder(), ROLLOVER_FILE_NAME));
-		lastPeriodRollover = dateStringToDate(rolloverdata.getString("lastrollover.period", "October 30, 1982 10:48:00pm"));
-		lastDayRollover = dateStringToDate(rolloverdata.getString("lastrollover.day", "October 30, 1982 10:48:00pm"));
-		lastWeekRollover = dateStringToDate(rolloverdata.getString("lastrollover.week", "October 30, 1982 10:48:00pm"));
-		lastMonthRollover = dateStringToDate(rolloverdata.getString("lastrollover.month", "October 30, 1982 10:48:00pm"));
-		saveRollovers();
-	}
+    public FileConfiguration getRolloverData() {
+          if (rolloverData == null) {
+              reloadRolloverData();
+          }
+          return rolloverData;
+      }
+
+    public void reloadRolloverData() {
+    	rolloverData = YamlConfiguration.loadConfiguration(rolloverDataFile);
+
+    	InputStream defaultDataStream = getResource(ROLLOVER_FILE_NAME);
+    	if (defaultDataStream != null) {
+    		YamlConfiguration defaultData = YamlConfiguration.loadConfiguration(defaultDataStream);
+
+    		rolloverData.setDefaults(defaultData);
+    	}
+    	loadRolloverData();
+    }
+    
+    public void loadRolloverData()	{
+    	lastPeriodRollover = stringToDate(rolloverData.getString("lastrollover.period"));
+    	lastDayRollover = stringToDate(rolloverData.getString("lastrollover.day"));
+    	lastWeekRollover = stringToDate(rolloverData.getString("lastrollover.week"));
+    	lastMonthRollover = stringToDate(rolloverData.getString("lastrollover.month"));
+    }
+    
+    public void saveRolloverData() {
+    	try {
+    		getConfig().save(rolloverDataFile);
+    	} catch (IOException ex) {
+    		severe("Could not save rollover data to " + rolloverDataFile);
+    	}
+    }
+    
+    public void saveDefaultConfig() {
+    	if (!rolloverDataFile.exists()) {
+    		saveResource(ROLLOVER_FILE_NAME, false);
+    	}
+    }
 	
 	private void saveRollovers()	{
-		rolloverdata.set("lastrollover.period", dateDateToString(lastPeriodRollover));
-		rolloverdata.set("lastrollover.day", dateDateToString(lastDayRollover));
-		rolloverdata.set("lastrollover.week", dateDateToString(lastWeekRollover));
-		rolloverdata.set("lastrollover.month", dateDateToString(lastMonthRollover));
-		saveResource(ROLLOVER_FILE_NAME, true);
+		rolloverData.set("lastrollover.period", dateToString(lastPeriodRollover));
+		rolloverData.set("lastrollover.day", dateToString(lastDayRollover));
+		rolloverData.set("lastrollover.week", dateToString(lastWeekRollover));
+		rolloverData.set("lastrollover.month", dateToString(lastMonthRollover));
+		saveRolloverData();
 	}
 	
-	private String dateDateToString(Date time)	{
+	private String dateToString(Date time)	{
 		return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(time);
 	}
 	
-	private Date dateStringToDate(String date)	{
+	private Date stringToDate(String date)	{
 		Date time = null;
 		try {
 			time = DateFormat.getDateInstance().parse(date);
@@ -203,10 +230,9 @@ public class ActivityStats extends JavaPlugin {
 	
 	public void payPlayer(ASPlayer player)	{
 		double amount;
-		String payMode = config.getString("economy.mode");
-		if (payMode.equalsIgnoreCase("Percent"))	{
+		if (config.ecoModePercent())	{
 			amount = getPercentPayment(player);
-		} else if (payMode.equalsIgnoreCase("Boolean"))	{
+		} else if (config.ecoModeBoolean())	{
 			amount = getBooleanPayment(player);
 		} else	{ 
 			return;
@@ -216,26 +242,26 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public double getPercentPayment(ASPlayer player)	{
-		return config.getDouble("economy.min") + ( config.getDouble("economy.max") - config.getDouble("economy.min") )* getActivityPercent(player) ;
+		return config.ecoMin + ( config.ecoMax - config.ecoMin ) * getActivityPercent(player) ;
 	}
 	
 	public double getActivityPercent (ASPlayer player)	{
-		return Math.max( 1.0, (double)player.getActivity() / config.getDouble("quota"));
+		return Math.min(0.0, Math.max( 1.0, (double)player.getActivity() / config.iQuota));
 	}
 	public double getBooleanPayment(ASPlayer player)	{
-		if((double)player.curPeriod.getActivity() > config.getDouble("quota"))
-			return config.getDouble("economy.max");
+		if((double)player.curPeriod.getActivity() > config.iQuota)
+			return config.ecoMax;
 		else
-			return config.getDouble("economy.min");
+			return config.ecoMin;
 	}
 	
 	public void msg(CommandSender sender, String msg)	{	sender.sendMessage(msg);	}
 	
-	public void severe(String msg)	{	log.severe(msg);	}
-	public void warning(String msg)	{	log.warning(msg);	}
-	public void info(String msg)	{	log.info(msg);		}
-	public void fine(String msg)	{	log.fine(msg);		}
-	public void finer(String msg)	{	log.finer(msg);		}
-	public void finest(String msg)	{	log.finest(msg);	}
+	public void severe(String msg)	{	log.severe("["+LOG_NAME+"]"+msg);	}
+	public void warning(String msg)	{	log.warning("["+LOG_NAME+"]"+msg);	}
+	public void info(String msg)	{	log.info("["+LOG_NAME+"]"+msg);		}
+	public void fine(String msg)	{	log.fine("["+LOG_NAME+"]"+msg);		}
+	public void finer(String msg)	{	log.finer("["+LOG_NAME+"]"+msg);		}
+	public void finest(String msg)	{	log.finest("["+LOG_NAME+"]"+msg);	}
 	
 }

@@ -13,12 +13,10 @@ public class ASDatabase {
 		this.scheduler = plugin.getServer().getScheduler();
 		
 		mySQL = new ASMySql(plugin);
-
-		createTables();
 	}
 	
 	public void createTables()	{
-		if (plugin.config().getBoolean("database.use-mysql"))	{	
+		if (plugin.config().useMySQL)	{	
 			scheduler.runTaskAsynchronously(plugin, new Runnable() {
 				public void run() {
 					mySQL.createTables();
@@ -28,7 +26,7 @@ public class ASDatabase {
 	}
 	
 	public void loadPlayer(final String player)	{
-		if (plugin.config().getBoolean("database.use-mysql"))	{	
+		if (plugin.config().useMySQL)	{	
 			scheduler.runTaskAsynchronously(plugin, new Runnable() {
 				public void run() {
 					mySQL.loadPlayer(player);
@@ -38,7 +36,7 @@ public class ASDatabase {
 	}
 	
 	public void updatePlayer(final ASPlayer player) 	{
-		if (plugin.config().getBoolean("database.use-mysql"))	{	
+		if (plugin.config().useMySQL)	{	
 			scheduler.runTaskAsynchronously(plugin, new Runnable() {
 				public void run() {
 					mySQL.updatePlayer(player);

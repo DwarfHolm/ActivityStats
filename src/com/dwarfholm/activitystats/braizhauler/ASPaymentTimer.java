@@ -9,7 +9,7 @@ public class ASPaymentTimer implements Runnable{
 	
 	public ASPaymentTimer(ActivityStats parent)	{
 		plugin = parent;
-		intervalInTicks = 20 * 60 * plugin.config().getInt("interval"); //Ticks per Second * Seconds Per minute * Minutes 
+		intervalInTicks = 20 * 60 * plugin.config().iInterval; //Ticks per Second * Seconds Per minute * Minutes 
 	}
 	
 	public void start()	{

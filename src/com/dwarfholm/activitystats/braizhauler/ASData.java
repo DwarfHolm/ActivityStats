@@ -19,6 +19,10 @@ public class ASData {
 			database.updatePlayer(player);
 	}
 	
+	public void createDatabase() {
+		database.createTables();
+	}
+	
 	public void recordOnline() {
 		for (ASPlayer player:playerlist.values())
 			if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
@@ -88,6 +92,8 @@ public class ASData {
 			playerlist.get(player).rolloverMonth();
 		plugin.rolledoverMonth();
 	}
+
+
 
 
 
