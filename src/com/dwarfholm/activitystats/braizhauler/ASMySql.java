@@ -183,7 +183,7 @@ public class ASMySql {
 			}
 			statement.close();
 		} catch (SQLException e) {
-			printStackError("MySQL create player error", e);
+			printStackError("MySQL load player error", e);
 		}
 
 		//Day Record Table
@@ -227,7 +227,7 @@ public class ASMySql {
 			}
 			statement.close();
 		} catch (SQLException e) {
-			printStackError("MySQL create player error", e);
+			printStackError("MySQL load Record table error", e);
 		}
 		return currentData;
 	}
@@ -259,6 +259,8 @@ public class ASMySql {
 			statement.setInt(4, player.total.getActivity());
 			statement.setInt(5, player.total.getOnline());
 			
+			plugin.info(playerQuery);
+			
 			statement.executeUpdate();
 			statement.close();
 		//Day Record Table
@@ -281,7 +283,6 @@ public class ASMySql {
 			statement.setInt(3, player.curWeek.getOnline());
 			statement.setInt(4, player.lastWeek.getActivity());
 			statement.setInt(5, player.lastWeek.getOnline());
-			
 			statement.executeUpdate();
 			
 			statement.close();
@@ -335,7 +336,7 @@ public class ASMySql {
 				statement.executeUpdate();
 				statement.close();
 			} catch (SQLException e) {
-				printStackError("MySQL create player error", e);
+				printStackError("MySQL update record error", e);
 			}
 		}
 	}
@@ -359,7 +360,7 @@ public class ASMySql {
 				statement.executeUpdate();
 				statement.close();
 			} catch (SQLException e) {
-				printStackError("MySQL create player error", e);
+				printStackError("MySQL update player error", e);
 			}
 		}
 		updateRecordTable(player, TableType.DAY);

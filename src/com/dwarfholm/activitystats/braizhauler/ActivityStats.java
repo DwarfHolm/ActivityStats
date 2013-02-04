@@ -49,10 +49,10 @@ public class ActivityStats extends JavaPlugin {
 	
 	public void onLoad()	{
 		log = Logger.getLogger(LOG_NAME);
-
+		
+		config = new ASConfig(this);
+		config.reloadConfig();
 		rolloverDataFile = new File(getDataFolder(), "config.yml");
-		
-		
 		
 		locale = new ASLocale(this);
 		vault = new Vault(this);
@@ -69,8 +69,7 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public void onEnable() {
-		
-		reloadConfig();
+		config.onEnable();
 		reloadRolloverData();
 		players.createDatabase();
 		

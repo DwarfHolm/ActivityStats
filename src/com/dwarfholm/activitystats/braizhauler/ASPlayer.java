@@ -14,6 +14,15 @@ public class ASPlayer {
 	
 	public ASPlayer(String name)	{
 		this.name=name;
+		curPeriod = new ASLongData();
+		lastPeriod = new ASLongData();
+		curDay = new ASShortData();
+		lastDay = new ASShortData();
+		curWeek = new ASShortData();
+		lastWeek = new ASShortData();
+		curMonth = new ASShortData();
+		lastMonth = new ASShortData();
+		total = new ASShortData();
 	}
 	
 	public void rolloverPeriod()	{

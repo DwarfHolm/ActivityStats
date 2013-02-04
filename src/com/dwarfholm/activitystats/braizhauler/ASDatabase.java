@@ -27,11 +27,7 @@ public class ASDatabase {
 	
 	public void loadPlayer(final String player)	{
 		if (plugin.config().useMySQL)	{	
-			scheduler.runTaskAsynchronously(plugin, new Runnable() {
-				public void run() {
-					mySQL.loadPlayer(player);
-				}
-			});
+			mySQL.loadPlayer(player);
 		}
 	}
 	

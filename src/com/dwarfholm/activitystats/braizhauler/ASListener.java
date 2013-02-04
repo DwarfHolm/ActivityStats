@@ -1,5 +1,6 @@
 package com.dwarfholm.activitystats.braizhauler;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -44,7 +45,10 @@ public class ASListener implements Listener {
     
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
     public void calculateTravel(PlayerTeleportEvent event) {
-    	plugin.getASPlayer(event.getPlayer().getName()).curPeriod.calculateTravel(event.getFrom(),event.getTo());
+    	Location to = event.getTo();
+    	Location from = event.getFrom();
+    	String name = event.getPlayer().getName();
+    	plugin.getASPlayer(name).curPeriod.calculateTravel(from, to); 
     }
     
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)

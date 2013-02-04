@@ -1,10 +1,6 @@
 package com.dwarfholm.activitystats.braizhauler;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.InvalidConfigurationException;
 
 public class ASConfig {
 	private ActivityStats plugin;
@@ -23,17 +19,17 @@ public class ASConfig {
 	public ASConfig(ActivityStats plugin)	{
 		this.plugin = plugin;
 	}
-	public void onEnable() throws FileNotFoundException, IOException, InvalidConfigurationException{
+	public void onEnable() {
 		reloadConfig();
 	}
 
-	public void reloadConfig() throws FileNotFoundException, IOException, InvalidConfigurationException	{
+	public void reloadConfig()	{
 		plugin.reloadConfig();
 		config = plugin.getConfig().getRoot();
 		loadConfig();
 	}
 	
-	public void loadConfig() throws FileNotFoundException, IOException, InvalidConfigurationException	{
+	public void loadConfig()	{
 		localeFileName = config.getString("locale.filename");
 		
 		iInterval = config.getInt("interval");
