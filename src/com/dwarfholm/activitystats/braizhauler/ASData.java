@@ -2,6 +2,8 @@ package com.dwarfholm.activitystats.braizhauler;
 
 import java.util.HashMap;
 
+import org.bukkit.entity.Player;
+
 
 public class ASData {
 	private HashMap <String, ASPlayer> playerlist;
@@ -24,6 +26,7 @@ public class ASData {
 	}
 	
 	public void recordOnline() {
+		plugin.info("Recording players Online");
 		for (ASPlayer player:playerlist.values())
 			if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
 				player.curPeriod.addOnline();
@@ -91,6 +94,11 @@ public class ASData {
 		for(String player: playerlist.keySet())
 			playerlist.get(player).rolloverMonth();
 		plugin.rolledoverMonth();
+	}
+
+	public void loadOnlinePlayers() {
+		for (Player player: plugin.getServer().getOnlinePlayers() )
+			loadPlayer(player.getName());
 	}
 
 

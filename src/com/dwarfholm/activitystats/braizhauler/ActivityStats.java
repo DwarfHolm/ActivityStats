@@ -74,6 +74,8 @@ public class ActivityStats extends JavaPlugin {
 		config.onEnable();
 		reloadRolloverData();
 		players.createDatabase();
+		players.loadOnlinePlayers();
+		
 		
 		locale.onEnable();
 		vault.connect();
@@ -244,7 +246,8 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public double getActivityPercent (ASPlayer player)	{
-		return Math.min(0.0, Math.max( 1.0, (double)player.getActivity() / config.iQuota));
+		info("Player = " + player.getName() + " " + String.valueOf(player.getActivity()) + "/" + String.valueOf(config.iQuota));
+		return Math.max(0.0, Math.min( 1.0, ((double)player.getActivity()) / ((double)config.iQuota)));
 	}
 	public double getBooleanPayment(ASPlayer player)	{
 		if((double)player.curPeriod.getActivity() > config.iQuota)

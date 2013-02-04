@@ -1,5 +1,7 @@
 package com.dwarfholm.activitystats.braizhauler;
 
+import org.bukkit.Location;
+
 public class ASPlayer {
 	private String name;
 	public ASLongData curPeriod;
@@ -52,6 +54,12 @@ public class ASPlayer {
 		return name;
 	}
 	public int getActivity()	{
-		return curPeriod.activity;
+		return curPeriod.getActivity();
+	}
+	public void calculateTravel(Location newLoc) {
+		curPeriod.calculateTravel(newLoc);
+	}
+	public void calculateTravel(Location from, Location to) {
+		curPeriod.calculateTravel(from, to);
 	}
 }

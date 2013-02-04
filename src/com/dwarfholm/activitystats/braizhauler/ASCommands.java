@@ -40,6 +40,7 @@ public class ASCommands implements CommandExecutor{
 	}
 	
 	public boolean reportActivity(CommandSender sender, Player target)	{
+		plugin.info("Report" + target.getName()+ "Activity");
 		String message = plugin.getLocalization().getActivityReportMessage(target);
 		plugin.msg(sender, message );
 		return true;

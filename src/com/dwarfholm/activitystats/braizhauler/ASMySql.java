@@ -345,11 +345,11 @@ public class ASMySql {
 		Timestamp curtime = getCurrentTime();
 		if(playerExists(player.getName()))	{
 			String query = "UPDATE `" + TableName(TableType.PLAYER) + "` " +
-			"SET `lastonline` = ?, `totalActivity` = ?, `totalOnline` = ?) " +
+			"SET `lastonline` = ?, `totalActivity` = ?, `totalOnline` = ? " +
 			"WHERE `player` LIKE ?;";
 			try {
 				statement = connection.prepareStatement(query);
-				
+							
 				statement.setTimestamp(1, curtime);
 				statement.setInt(2, player.total.getActivity());
 				statement.setInt(3, player.total.getOnline());
