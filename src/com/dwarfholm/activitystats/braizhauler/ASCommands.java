@@ -15,17 +15,20 @@ public class ASCommands implements CommandExecutor{
 	
 	public void registerCommands() {
 		plugin.getCommand("activitystats").setExecutor(this);
-		plugin.getCommand("activity").setExecutor(this);	
+		plugin.getCommand("activity").setExecutor(this);
+		plugin.getCommand("nextpayday").setExecutor(this);
 	}
 
 	
 	public void unregisterCommands() {
 		plugin.getCommand("activitystats").setExecutor(null);
 		plugin.getCommand("activity").setExecutor(null);
+		plugin.getCommand("nextpayday").setExecutor(null);
 	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		plugin.info("Attempting to run " + label + " for " + sender.getName()); 
 		if (command.getName().equalsIgnoreCase("activitystats"))	{
 			if (args.length == 0)	{
 				if (plugin.perms().has(sender, "activitystats.view.self"))	{
@@ -58,6 +61,13 @@ public class ASCommands implements CommandExecutor{
 			}
 			return true;
 		}
+		if (command.getName().equalsIgnoreCase("nextpayday"))	{
+			if (plugin.perms().has(sender, "activitystats.view.self"))	{
+				reportPayday(sender);
+			} else {
+				plugin.msg(sender, plugin.getLocalization().getLackPermission("activitystats.view.self"));
+			}
+		}
 		return false;
 	}
 	
@@ -73,6 +83,9 @@ public class ASCommands implements CommandExecutor{
 			plugin.msg(sender, message );
 		return true;
 	}
-
+	public boolean reportPayday(CommandSender sender)	{
+		plugin.msg(sender, plugin.getLocalization().getPayTimeMessage());
+		return true;
+	}
 
 }

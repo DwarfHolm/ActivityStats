@@ -10,8 +10,14 @@ commands:
       permission-message: You lack the permission activitystats.view.self
       
    activity:
-      description: Displays your activity statistics.
+      description: Displays your activity percent.
       usage: /activity
+      permission: activitystats.view.self
+      permission-message: You lack the permission activitystats.view.self
+
+   nextpayday:
+      description: Displays time in minutes until next payout.
+      usage: /nextpayday
       permission: activitystats.view.self
       permission-message: You lack the permission activitystats.view.self
 

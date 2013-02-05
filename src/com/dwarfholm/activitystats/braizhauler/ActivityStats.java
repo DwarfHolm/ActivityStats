@@ -55,7 +55,7 @@ public class ActivityStats extends JavaPlugin {
 		
 		config = new ASConfig(this);
 		config.reloadConfig();
-		rolloverDataFile = new File(getDataFolder(), "config.yml");
+		rolloverDataFile = new File(getDataFolder(), ROLLOVER_FILE_NAME);
 		
 		locale = new ASLocale(this);
 		vault = new Vault(this);

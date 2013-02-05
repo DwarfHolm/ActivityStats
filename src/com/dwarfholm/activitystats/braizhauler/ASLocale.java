@@ -83,7 +83,7 @@ public class ASLocale {
 		return report;
 	}
 	
-	public String getPayTime() {
+	public String getPayTimeMessage() {
 		return String.format(msgTimeToPay, plugin.timeToPay());
 	}
 
