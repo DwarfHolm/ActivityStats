@@ -16,6 +16,12 @@ public class ASConfig {
 	public String ecoMode;
 	public double ecoMin, ecoMax;
 	
+	
+	public int prmWatchedRanksCount;
+	public String[] prmWatchedRanks;
+	public int[] prmMinutePlayed;
+	public String[] prmRanksTo;
+	
 	public ASConfig(ActivityStats plugin)	{
 		this.plugin = plugin;
 	}
@@ -62,6 +68,50 @@ public class ASConfig {
 		ecoMode = config.getString("economy.mode");
 		ecoMin = config.getDouble("economy.min");
 		ecoMax = config.getDouble("economy.max");
+		
+		loadPromoterRanks();
+	}
+	
+	private void loadPromoterRanks()	{
+		prmWatchedRanks = parseRankList(config.getString("autopromote.ranks-promoted"));
+		prmWatchedRanksCount = prmWatchedRanks.length;
+		prmMinutePlayed = new int[prmWatchedRanksCount];
+		prmRanksTo = new String[prmWatchedRanksCount];
+		for( int count = 0; count < prmWatchedRanksCount; count++)	{
+			prmMinutePlayed[count] = config.getInt("autopromote." + prmWatchedRanks[count] + ".minutes-played");     
+			prmRanksTo[count] = config.getString("autopromote." + prmWatchedRanks[count] + ".to-rank");
+		}
+	}
+	
+	private String[] parseRankList(String list)	{
+		return list.split(",\\s+");
+	}
+	
+	public boolean promoterWatchingRank(String rankName)	{
+		boolean watched = false;
+		for ( int count = 0; count < prmWatchedRanksCount; count++)	{
+			if (prmWatchedRanks[count].equalsIgnoreCase(rankName))
+				 watched = true;
+		}
+		return watched;
+	}
+	
+	public int promoterMinutes(String rankName)	{
+		int minutes = 0;
+		for ( int count = 0; count < prmWatchedRanksCount; count++)	{
+			if (prmWatchedRanks[count].equalsIgnoreCase(rankName))
+				 minutes = prmMinutePlayed[count];
+		}
+		return minutes;
+	}
+	
+	public String promoterRankTo(String rankName)	{
+		String newRank = null;
+		for ( int count = 0; count < prmWatchedRanksCount; count++)	{
+			if (prmWatchedRanks[count].equalsIgnoreCase(rankName))
+				 newRank = prmRanksTo[count];
+		}
+		return newRank;
 	}
 	
 	public boolean ecoModePercent()	{	return ecoMode.equalsIgnoreCase("PERCENT");	}

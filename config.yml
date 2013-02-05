@@ -53,8 +53,21 @@ economy:
    #    Max is amount received if met or exceded activity level quota
    # if Percent
    #    Income = Min + (Max - Min) * (Activity / Quota <at most 1>)
-   #   -or less accuatly-
+   #   -or less accurately-
    #    Income = %Activity of Maximum 
 
    min: 0.0
    max: 2.0
+   
+autopromote:
+   #ranks promoted comma seperated.
+   ranks-promoted: Conscript, Dwarf, Elf
+   Conscript:
+      minutes-played: 500
+      to-rank: Veteran
+   Dwarf:
+      minutes-played: 3000
+      to-rank: Mountaineer
+   Elf:
+      minutes-played: 3000
+      to-rank: GladeWarden
