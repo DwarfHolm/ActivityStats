@@ -205,22 +205,23 @@ public class ActivityStats extends JavaPlugin {
 
 		saveRolloverData();
 	}
-	
-	public int timeToPay()	{
-		return (int)(lastPeriodRollover.getTime()-System.currentTimeMillis() + MILLIS_PER_MINUTE*config.iInterval);
-	}
-	
+
 	public void saveRolloverData() {
 	    if (rolloverData == null || rolloverDataFile == null) {
 	    	return;
 	    }
 	    try {
-	        getRolloverData().save(rolloverDataFile);
+	        rolloverData.save(rolloverDataFile);
 	    } catch (IOException ex) {
 	        severe("Could not save config to " + rolloverDataFile);
 	    }
 	}
     	
+
+	public int timeToPay()	{
+		return (int)(( lastPeriodRollover.getTime()-System.currentTimeMillis() ) / MILLIS_PER_MINUTE + config.iInterval );
+	}
+	
     public void saveDefaultConfig() {
     	if (!rolloverDataFile.exists()) {
     		saveResource(ROLLOVER_FILE_NAME, false);
