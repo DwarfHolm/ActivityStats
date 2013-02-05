@@ -193,27 +193,33 @@ public class ActivityStats extends JavaPlugin {
     	lastMonthRollover = stringToDate(rolloverData.getString("lastrollover.month"));
     }
     
-    public void saveRolloverData() {
-    	try {
-    		getConfig().save(rolloverDataFile);
-    	} catch (IOException ex) {
-    		severe("Could not save rollover data to " + rolloverDataFile);
-    	}
-    }
-    
+	private void saveRollovers()	{
+		rolloverData.set("lastrollover.period", dateToString(lastPeriodRollover));
+		rolloverData.set("lastrollover.day", dateToString(lastDayRollover));
+		rolloverData.set("lastrollover.week", dateToString(lastWeekRollover));
+		rolloverData.set("lastrollover.month", dateToString(lastMonthRollover));
+
+		saveRolloverData();
+	}
+	
+	public void saveRolloverData() {
+	    if (rolloverData == null || rolloverDataFile == null) {
+	    	return;
+	    }
+	    try {
+	        getRolloverData().save(rolloverDataFile);
+	    } catch (IOException ex) {
+	        severe("Could not save config to " + rolloverDataFile);
+	    }
+	}
+    	
     public void saveDefaultConfig() {
     	if (!rolloverDataFile.exists()) {
     		saveResource(ROLLOVER_FILE_NAME, false);
     	}
     }
 	
-	private void saveRollovers()	{
-		rolloverData.set("lastrollover.period", dateToString(lastPeriodRollover));
-		rolloverData.set("lastrollover.day", dateToString(lastDayRollover));
-		rolloverData.set("lastrollover.week", dateToString(lastWeekRollover));
-		rolloverData.set("lastrollover.month", dateToString(lastMonthRollover));
-		saveRolloverData();
-	}
+
 	
 	private String dateToString(Date time)	{
 		return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(time);
