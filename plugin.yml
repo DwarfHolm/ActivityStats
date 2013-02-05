@@ -8,6 +8,12 @@ commands:
       usage: /activitystats
       permission: activitystats.view.self
       permission-message: You lack the permission activitystats.view.self
+      
+   activity:
+      description: Displays your activity statistics.
+      usage: /activity
+      permission: activitystats.view.self
+      permission-message: You lack the permission activitystats.view.self
 
 permissions:
    activitystats.view.*:

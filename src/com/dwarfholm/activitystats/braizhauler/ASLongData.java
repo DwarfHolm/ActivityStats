@@ -111,4 +111,31 @@ public class ASLongData extends ASShortData {
 		travel((int)(dist / 10 * config.iTravelMult));
 		curLoc = to;
 	}
+	
+	public int getActivity()	{
+		return activity;
+	}
+	public int getActivity(ActivityType type)	{
+		switch(type)	{
+			case BREAK:
+				return blockBreak;
+			case PLACE:
+				return blockPlace;
+			case TRAVEL:
+				return traveled;
+			case CHAT:
+				return chat;
+			case ANIMAL:
+				return damAnimal;
+			case MONSTER:
+				return damMonster;
+			case PLAYER:
+				return damPlayer;
+		}
+		return activity;
+	}
+	
+	public enum	ActivityType{
+		BREAK, PLACE, TRAVEL, CHAT, ANIMAL, MONSTER, PLAYER
+	}
 }

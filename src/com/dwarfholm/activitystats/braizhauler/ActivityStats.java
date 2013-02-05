@@ -202,6 +202,10 @@ public class ActivityStats extends JavaPlugin {
 		saveRolloverData();
 	}
 	
+	public int timeToPay()	{
+		return (int)(lastPeriodRollover.getTime()-System.currentTimeMillis() + MILLIS_PER_MINUTE*config.iInterval);
+	}
+	
 	public void saveRolloverData() {
 	    if (rolloverData == null || rolloverDataFile == null) {
 	    	return;
@@ -281,5 +285,6 @@ public class ActivityStats extends JavaPlugin {
 						info("AutoPromoted " + player.getName());
 		
 	}
+	
 	
 }

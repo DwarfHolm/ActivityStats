@@ -1,6 +1,25 @@
+term:
+   
+   break: breaking blocks
+   place: placing blocks
+   travel: traveling
+   chat: chatting
+   animal: attacking animals
+   monster: attacking monsters
+   player: attacking players
+   activity: activity
+
 message:
    payment: "You've been payed ? for ?% activity."
    #       #First ? replaced with formated amount;
    #       #Secound ? replaced with %activity
    activity-report: "You are ?% active."
    #       # ? replaced with activity%;
+   time-til-payment: "Next payment in ? minutes"
+   #       #First ? replaced with number of minutes;   
+   activity-detail: "You have ? points from ?."
+   #       #First ? replaced points recieved;
+   #       #Secound ? replaced with [term]
+
+errors:
+   lack-permission: "You lack permission: ?"
