@@ -42,7 +42,7 @@ public class ASConfig {
 		iQuota = config.getInt("quota");
 		iBreakMax = config.getInt("block-break.max");
 		iBreakMult = config.getInt("block-break.multiplier");
-		iPlaceMax = config.getInt("block-plack.max");
+		iPlaceMax = config.getInt("block-place.max");
 		iPlaceMult = config.getInt("block-place.multiplier");
 		iTravelMax = config.getInt("blocks-traveled.max");
 		iTravelMult = config.getInt("blocks-traveled.multiplier");
