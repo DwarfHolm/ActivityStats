@@ -15,6 +15,7 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ActivityStats extends JavaPlugin {
@@ -265,5 +266,14 @@ public class ActivityStats extends JavaPlugin {
 	public void fine(String msg)	{	log.fine("["+LOG_NAME+"]"+msg);		}
 	public void finer(String msg)	{	log.finer("["+LOG_NAME+"]"+msg);		}
 	public void finest(String msg)	{	log.finest("["+LOG_NAME+"]"+msg);	}
+
+	public void autoPromoterCheck(Player player)	{
+		String curRank = perms().getPrimaryGroup(player);
+		if ( config.promoterWatchingRank(curRank) )
+			if ( getASPlayer(player.getName()).total.getActivity() > config.promoterPoints(curRank) )
+				if ( perms().playerAddGroup(player, config.promoterRankTo(curRank)) )
+						info("AutoPromoted " + player.getName());
+		
+	}
 	
 }

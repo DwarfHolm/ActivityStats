@@ -96,13 +96,14 @@ public class ASConfig {
 		return watched;
 	}
 	
-	public int promoterMinutes(String rankName)	{
-		int minutes = 0;
+	public int promoterPoints(String rankName)	{
+		int minutes = 0, points = 0;
 		for ( int count = 0; count < prmWatchedRanksCount; count++)	{
 			if (prmWatchedRanks[count].equalsIgnoreCase(rankName))
 				 minutes = prmMinutePlayed[count];
 		}
-		return minutes;
+		points = (iQuota * minutes) / iInterval;
+		return points;
 	}
 	
 	public String promoterRankTo(String rankName)	{

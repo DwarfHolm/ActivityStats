@@ -26,29 +26,38 @@ public class ASData {
 	}
 	
 	public void recordOnline() {
-		plugin.info("Recording players Online");
-		for (ASPlayer player:playerlist.values())
-			if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
-				player.curPeriod.addOnline();
-		if( plugin.PeriodRolloverDue())	{
-			plugin.info("Paying all Players");
-			for (ASPlayer player:playerlist.values())	{
-				plugin.info(player.getName());
-				plugin.payPlayer(player);
-			}
-			if( plugin.DayRolloverDue())
-				rolloverDay();
-			if( plugin.WeekRolloverDue())
-				rolloverWeek();
-			if( plugin.MonthRolloverDue())
-				rolloverMonth();
-			rolloverPeriod();
+		if (playerlist.size() > 0)	{
 			for (ASPlayer player:playerlist.values())
-				if ( !plugin.getServer().getPlayer(player.getName()).isOnline() )
-					playerlist.remove(player.getName());
-			saveAll();
+				if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
+					player.curPeriod.addOnline();
+			if( plugin.PeriodRolloverDue())	{
+				plugin.info("Paying all Players");
+				for (ASPlayer player:playerlist.values())	{
+					plugin.info(player.getName());
+					plugin.payPlayer(player);
+				}
+				if( plugin.DayRolloverDue())
+					rolloverDay();
+				if( plugin.WeekRolloverDue())
+					rolloverWeek();
+				if( plugin.MonthRolloverDue())
+					rolloverMonth();
+				rolloverPeriod();
+				Player pPlayer;
+				for (ASPlayer player:playerlist.values())	{
+					pPlayer = plugin.getServer().getPlayer(player.getName());
+					if ( pPlayer.isOnline() )
+						plugin.autoPromoterCheck(pPlayer);
+					else
+						playerlist.remove(player.getName());
+				}
+						
+				saveAll();
+			}
 		}
 	}
+	
+
 	
 	public void loadPlayer(String player)	{
 		database.loadPlayer(player);

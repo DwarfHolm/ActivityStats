@@ -108,7 +108,7 @@ public class ASLongData extends ASShortData {
 		double dist = 0;
 		if (curLoc!=null) 
 			dist = curLoc.distance(from);
-		travel((int)(dist * config.iTravelMult));
+		travel((int)(dist / 10 * config.iTravelMult));
 		curLoc = to;
 	}
 }
