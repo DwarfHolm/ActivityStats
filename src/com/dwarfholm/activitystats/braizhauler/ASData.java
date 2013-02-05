@@ -26,10 +26,13 @@ public class ASData {
 	}
 	
 	public void recordOnline() {
+		plugin.info("recordOnline fired");//DEBUG
 		if (playerlist!=null && playerlist.size() > 0)	{
+			plugin.info("recordOnline has playerList");//DEBUG
 			for (ASPlayer player:playerlist.values())
 				if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
 					player.curPeriod.addOnline();
+			plugin.info("recordOnline looking for rollovers"); //DEBUG
 			if( plugin.PeriodRolloverDue())	{
 				plugin.info("Paying all Players");
 				for (ASPlayer player:playerlist.values())	{
@@ -49,11 +52,15 @@ public class ASData {
 					if ( pPlayer.isOnline() )
 						plugin.autoPromoterCheck(pPlayer);
 					else
-						playerlist.remove(player.getName());
+						playerlist.remove(player.getName());//DEBUG
 				}
 						
 				saveAll();
+			} else {
+				plugin.info("recordOnline not rolling over");//DEBUG
 			}
+		} else	{
+			plugin.info("recordOnline failed due to empty playerlist");
 		}
 	}
 	
