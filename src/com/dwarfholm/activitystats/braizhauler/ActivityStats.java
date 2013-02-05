@@ -72,12 +72,10 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public void onEnable() {
-		
 		config.onEnable();
 		reloadRolloverData();
 		players.createDatabase();
 		players.loadOnlinePlayers();
-		
 		
 		locale.onEnable();
 		vault.connect();

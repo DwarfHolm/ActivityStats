@@ -98,7 +98,7 @@ public class ASLongData extends ASShortData {
 		online += 1;
 	}	
 	private void calculateActivity()	{
-		activity = Math.max(config.iQuota, blockBreak + blockPlace + traveled + chat + damAnimal + damMonster + damPlayer);
+		activity = Math.min(config.iQuota, blockBreak + blockPlace + traveled + chat + damAnimal + damMonster + damPlayer);
 	}
 
 	public void calculateTravel(Location newLoc) {

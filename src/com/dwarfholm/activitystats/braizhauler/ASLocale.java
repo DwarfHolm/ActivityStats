@@ -3,13 +3,14 @@ package com.dwarfholm.activitystats.braizhauler;
 import java.io.File;
 import java.io.InputStream;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.dwarfholm.activitystats.braizhauler.ASLongData.ActivityType;
 
 public class ASLocale {
 	private ActivityStats plugin;
-	private YamlConfiguration locale;
+	private FileConfiguration locale;
 	private File localeFile = null;
 
 	private String termBreak, termPlace, termTravel, termChat, termAnimal, termMonster, termPlayer, termActivity;
@@ -17,7 +18,7 @@ public class ASLocale {
 	private String msgPayment, msgActivityReport, msgActivityDetail, msgTimeToPay;
 	private String errLackPermission;
 	
-	public ASLocale(ActivityStats plugin){
+	public ASLocale(ActivityStats plugin)	{
 		this.plugin = plugin;
 	}
 
@@ -32,7 +33,7 @@ public class ASLocale {
 	    locale = YamlConfiguration.loadConfiguration(localeFile);
 	 
 	    // Look for defaults in the jar
-	    InputStream defaultConfigStream = plugin.getResource("locale.yml");
+	    InputStream defaultConfigStream = plugin.getResource("enUS.yml");
 	    if (defaultConfigStream != null) {
 	        YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(defaultConfigStream);
 	        locale.setDefaults(defaultConfig);
@@ -40,32 +41,30 @@ public class ASLocale {
 	    loadLocale();
 	}
 	
-
-
 	private void loadLocale() {
-		termBreak = locale.getString("term.break");
-		termPlace = locale.getString("term.place");
-		termTravel = locale.getString("term.travel");
-		termChat = locale.getString("term.chat");
-		termAnimal = locale.getString("term.animal");
+		termBreak   = locale.getString("term.break");
+		termPlace   = locale.getString("term.place");
+		termTravel  = locale.getString("term.travel");
+		termChat    = locale.getString("term.chat");
+		termAnimal  = locale.getString("term.animal");
 		termMonster = locale.getString("term.monster");
-		termPlayer = locale.getString("term.player");
-		termActivity = locale.getString("term.activity");
+		termPlayer  = locale.getString("term.player");
+		termActivity= locale.getString("term.activity");
 		
 		msgPayment = locale.getString("message.payment").replaceAll("%","%%").replaceAll("\\?", "%s");
 		msgActivityReport = locale.getString("message.activity-report").replaceAll("%","%%").replaceFirst("\\?", "%.2f").replaceFirst("\\?", "%s");
-		msgActivityDetail = locale.getString("activity-detail").replaceAll("%","%%").replaceFirst("\\?", "%.d").replaceFirst("\\?", "%s");
+		msgActivityDetail = locale.getString("message.activity-detail").replaceAll("%","%%").replaceFirst("\\?", "%d").replaceFirst("\\?", "%s");
 		msgTimeToPay = locale.getString("message.time-til-payment").replaceAll("%","%%").replaceFirst("\\?", "%d");
-		errLackPermission = locale.getString("errors.lack-permission").replaceAll("%","%%").replaceFirst("\\?", "%s");
+		errLackPermission = locale.getString("error.lack-permission").replaceAll("%","%%").replaceFirst("\\?", "%s");
 		
 	}
 
-	public String getPaymentMessage(double amount, double percent) {
+	public String getPaymentMessage(double amount, double percent)	{
 		percent = (float)(100 * percent);
 		return String.format(msgPayment, plugin.econ().format(amount),percent);
 	}
 
-	public String getActivityReportMessage(ASPlayer target) {
+	public String getActivityReportMessage(ASPlayer target)	{
 		float percent = (float)(100 * plugin.getActivityPercent(target));
 		return String.format(msgActivityReport, percent);
 	}
