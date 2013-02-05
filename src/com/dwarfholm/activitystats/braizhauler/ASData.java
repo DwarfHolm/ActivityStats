@@ -26,7 +26,7 @@ public class ASData {
 	}
 	
 	public void recordOnline() {
-		if (playerlist.size() > 0)	{
+		if (playerlist!=null && playerlist.size() > 0)	{
 			for (ASPlayer player:playerlist.values())
 				if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
 					player.curPeriod.addOnline();
