@@ -23,7 +23,6 @@ public class ActivityStats extends JavaPlugin {
 	private ASLocale locale;
 	private Logger log;
 	private ASData players;
-	private ASCommands commands;
 	private ASListener listener;
 	private ASConfig config;
 	
@@ -64,14 +63,16 @@ public class ActivityStats extends JavaPlugin {
 		players = new ASData(this);
 		ASLongData.setConfig(config);
 		
-		commands = new ASCommands(this);
 		listener = new ASListener(this);
 		
 		travelTimer = new ASTravelTimer(this);
 		payTimer = new ASPaymentTimer(this);
+		
+		
 	}
 	
 	public void onEnable() {
+		
 		config.onEnable();
 		reloadRolloverData();
 		players.createDatabase();
@@ -81,7 +82,10 @@ public class ActivityStats extends JavaPlugin {
 		locale.onEnable();
 		vault.connect();
 		
-		commands.registerCommands();
+		getCommand("activitystats").setExecutor(new ASCmdActivityStats(this));
+		getCommand("activity").setExecutor(new ASCmdActivity(this));
+		getCommand("nextpayday").setExecutor(new ASCmdNextPayDay(this));
+		
 		listener.register();
 		travelTimer.start();
 		payTimer.start();
@@ -91,7 +95,9 @@ public class ActivityStats extends JavaPlugin {
 	
 	public void onDisable() {
 		listener.unregister();
-		commands.unregisterCommands();
+		getCommand("activitystats").setExecutor(null);
+		getCommand("activity").setExecutor(null);
+		getCommand("nextpayday").setExecutor(null);
 
 		payTimer.stop();
 		travelTimer.stop();
