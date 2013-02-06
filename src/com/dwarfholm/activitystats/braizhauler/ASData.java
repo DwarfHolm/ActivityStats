@@ -16,10 +16,7 @@ public class ASData {
 		database = new ASDatabase(plugin);
 	}
 	
-	public void saveAll()	{
-		for (ASPlayer player:playerlist.values())
-			database.updatePlayer(player);
-	}
+
 	
 	public void createDatabase() {
 		database.createTables();
@@ -27,10 +24,10 @@ public class ASData {
 	
 	public void recordOnline() {
 		plugin.info("recordOnline fired");//DEBUG
-		if (playerlist!=null && playerlist.size() > 0)	{
+		if (playerlist!=null && playerlist.isEmpty())	{
 			plugin.info("recordOnline has playerList");//DEBUG
 			for (ASPlayer player:playerlist.values())
-				if ( plugin.getServer().getPlayer(player.getName()).isOnline() )
+				if ( plugin.getServer().getPlayer(player.getName()) != null)
 					player.curPeriod.addOnline();
 			plugin.info("recordOnline looking for rollovers"); //DEBUG
 			if( plugin.PeriodRolloverDue())	{
@@ -39,20 +36,25 @@ public class ASData {
 					plugin.info(player.getName());
 					plugin.payPlayer(player);
 				}
-				if( plugin.DayRolloverDue())
-					rolloverDay();
-				if( plugin.WeekRolloverDue())
-					rolloverWeek();
-				if( plugin.MonthRolloverDue())
-					rolloverMonth();
 				rolloverPeriod();
+				
+				if( plugin.DayRolloverDue() || plugin.WeekRolloverDue() || plugin.MonthRolloverDue() )	{
+					saveAll();
+					if ( plugin.DayRolloverDue() )
+						database.rolloverDay();
+					if ( plugin.WeekRolloverDue() )
+						database.rolloverWeek();
+					if ( plugin.MonthRolloverDue() )
+						database.rolloverMonth();
+					loadOnlinePlayers();
+				}
 				Player pPlayer;
 				for (ASPlayer player:playerlist.values())	{
 					pPlayer = plugin.getServer().getPlayer(player.getName());
-					if ( pPlayer.isOnline() )
-						plugin.autoPromoterCheck(pPlayer);
+					if ( pPlayer == null )
+						playerlist.remove(player.getName());
 					else
-						playerlist.remove(player.getName());//DEBUG
+						plugin.autoPromoterCheck(pPlayer);
 				}
 						
 				saveAll();
@@ -60,7 +62,7 @@ public class ASData {
 				plugin.info("recordOnline not rolling over");//DEBUG
 			}
 		} else	{
-			plugin.info("recordOnline failed due to empty playerlist");
+			plugin.info("recordOnline failed due to empty playerlist");//debug
 		}
 	}
 	
@@ -96,29 +98,13 @@ public class ASData {
 		}
 		plugin.rolledoverPeriod();
 	}
-	public void rolloverDay()	{
-		for(String player: playerlist.keySet())
-			playerlist.get(player).rolloverDay();
-		plugin.rolledoverDay();
-	}
-	public void rolloverWeek()	{
-		for(String player: playerlist.keySet())
-			playerlist.get(player).rolloverWeek();
-		plugin.rolledoverWeek();
-	}
-	public void rolloverMonth()	{
-		for(String player: playerlist.keySet())
-			playerlist.get(player).rolloverMonth();
-		plugin.rolledoverMonth();
-	}
 
 	public void loadOnlinePlayers() {
 		for (Player player: plugin.getServer().getOnlinePlayers() )
 			loadPlayer(player.getName());
 	}
-
-
-
-
-
+	public void saveAll()	{
+		for (ASPlayer player:playerlist.values())
+			database.updatePlayer(player);
+	}
 }

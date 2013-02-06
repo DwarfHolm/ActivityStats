@@ -40,4 +40,32 @@ public class ASDatabase {
 			});
 		}
 	}
+	
+	public void rolloverDay()	{
+		if (plugin.config().useMySQL)	{	
+			scheduler.runTaskAsynchronously(plugin, new Runnable() {
+				public void run() {
+					mySQL.rollover(TableType.DAY);
+				}
+			});
+		}
+	}
+	public void rolloverWeek()	{
+		if (plugin.config().useMySQL)	{	
+			scheduler.runTaskAsynchronously(plugin, new Runnable() {
+				public void run() {
+					mySQL.rollover(TableType.WEEK);
+				}
+			});
+		}
+	}
+	public void rolloverMonth()	{
+		if (plugin.config().useMySQL)	{	
+			scheduler.runTaskAsynchronously(plugin, new Runnable() {
+				public void run() {
+					mySQL.rollover(TableType.MONTH);
+				}
+			});
+		}
+	}
 }

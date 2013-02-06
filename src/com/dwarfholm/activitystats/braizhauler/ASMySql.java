@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+
 public class ASMySql {
 	private ActivityStats plugin;
 	private String prefix;
@@ -208,22 +209,10 @@ public class ASMySql {
 			result = statement.executeQuery();
 			
 			if (result.next())	{
-				if ( table == TableType.DAY)	{
-					currentData.curDay.activity = result.getInt("curActivity");
-					currentData.curDay.online = result.getInt("curOnline");
-					currentData.lastDay.activity = result.getInt("lastActivity");
-					currentData.lastDay.online = result.getInt("lastOnline");
-				} else if ( table == TableType.DAY)	{
-					currentData.curWeek.activity = result.getInt("curActivity");
-					currentData.curWeek.online = result.getInt("curOnline");
-					currentData.lastWeek.activity = result.getInt("lastActivity");
-					currentData.lastWeek.online = result.getInt("lastOnline");
-				} else if ( table == TableType.DAY)	{
-					currentData.curMonth.activity = result.getInt("curActivity");
-					currentData.curMonth.online = result.getInt("curOnline");
-					currentData.lastMonth.activity = result.getInt("lastActivity");
-					currentData.lastMonth.online = result.getInt("lastOnline");
-				}
+				currentData = setCurActivity(currentData, table, result.getInt("curActivity"));
+				currentData = setCurOnline(currentData, table, result.getInt("curOnline"));
+				currentData = setLastActivity(currentData, table, result.getInt("lastActivity"));
+				currentData = setLastOnline(currentData, table, result.getInt("lastOnline"));
 			}
 			statement.close();
 		} catch (SQLException e) {
@@ -237,21 +226,12 @@ public class ASMySql {
 		PreparedStatement statement = null;
 		Timestamp curtime = getCurrentTime();
 	
-		String playerQuery = "INSERT INTO `" + TableName(TableType.PLAYER) + "` " +
+		String query = "INSERT INTO `" + TableName(TableType.PLAYER) + "` " +
 						"(`player`, `joined`, `lastonline`, `totalActivity`, `totalOnline`) " +
-						" VALUES (?, ?, ?, ?, ?);";
-		String dayQuery = "INSERT INTO `" + TableName(TableType.DAY) + "` " +
-						"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
-						" VALUES (?, ?, ?, ?, ?);";
-		String weekQuery = "INSERT INTO `" + TableName(TableType.WEEK) + "` " +
-						"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
-						" VALUES (?, ?, ?, ?, ?);";
-		String monthQuery = "INSERT INTO `" + TableName(TableType.MONTH) + "` " +
-						"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
 						" VALUES (?, ?, ?, ?, ?);";
 		try {
 		//Player Table
-			statement = connection.prepareStatement(playerQuery);
+			statement = connection.prepareStatement(query);
 			
 			statement.setString(1, player.getName());
 			statement.setTimestamp(2, curtime);
@@ -261,44 +241,32 @@ public class ASMySql {
 			
 			statement.executeUpdate();
 			statement.close();
-		//Day Record Table
-			statement = connection.prepareStatement(dayQuery);
-			
-			statement.setString(1, player.getName());
-			statement.setInt(2, player.curDay.getActivity());
-			statement.setInt(3, player.curDay.getOnline());
-			statement.setInt(4, player.lastDay.getActivity());
-			statement.setInt(5, player.lastDay.getOnline());
-			
-			statement.executeUpdate();
-			
-			statement.close();
+		//Day record
+			createPlayerRecord(connection, TableType.DAY, player);
 		//Week record
-			statement = connection.prepareStatement(weekQuery);
-			
-			statement.setString(1, player.getName());
-			statement.setInt(2, player.curWeek.getActivity());
-			statement.setInt(3, player.curWeek.getOnline());
-			statement.setInt(4, player.lastWeek.getActivity());
-			statement.setInt(5, player.lastWeek.getOnline());
-			statement.executeUpdate();
-			
-			statement.close();
+			createPlayerRecord(connection, TableType.WEEK, player);
 		//Month record
-			statement = connection.prepareStatement(monthQuery);
-			
-			statement.setString(1, player.getName());
-			statement.setInt(2, player.curMonth.getActivity());
-			statement.setInt(3, player.curMonth.getOnline());
-			statement.setInt(4, player.lastMonth.getActivity());
-			statement.setInt(5, player.lastMonth.getOnline());
-			
-			statement.executeUpdate();
-			
-			statement.close();
+			createPlayerRecord(connection, TableType.MONTH, player);
 		} catch (SQLException e) {
 			printStackError("MySQL create player error", e);
 		}
+	}
+	
+	private void createPlayerRecord(Connection connection, TableType table, ASPlayer player) throws SQLException	{	
+		String query = "INSERT INTO `" + TableName(table) + "` " +
+				"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
+				" VALUES (?, ?, ?, ?, ?);";
+		
+		PreparedStatement statement = connection.prepareStatement(query);
+		
+		statement.setString(1, player.getName());
+		statement.setInt(2, getCurActivity(player, table));
+		statement.setInt(3, getCurOnline(player, table));
+		statement.setInt(4, getLastActivity(player, table));
+		statement.setInt(5, getLastOnline(player, table));
+		
+		statement.executeUpdate();
+		statement.close();
 	}
 	
 	private void updateRecordTable(ASPlayer player, TableType table) {
@@ -311,24 +279,10 @@ public class ASMySql {
 			try {
 				
 				statement = connection.prepareStatement(query);
-				
-				if (table == TableType.DAY)	{
-					statement.setInt(1, player.curDay.getActivity());
-					statement.setInt(2, player.curDay.getOnline());
-					statement.setInt(3, player.lastDay.getActivity());
-					statement.setInt(4, player.lastDay.getOnline());	
-				} else if (table == TableType.WEEK)	{
-					statement.setInt(1, player.curWeek.getActivity());
-					statement.setInt(2, player.curWeek.getOnline());
-					statement.setInt(3, player.lastWeek.getActivity());
-					statement.setInt(4, player.lastWeek.getOnline());
-				} else if (table == TableType.MONTH)	{
-					statement.setInt(1, player.curMonth.getActivity());
-					statement.setInt(2, player.curMonth.getOnline());
-					statement.setInt(3, player.lastMonth.getActivity());
-					statement.setInt(4, player.lastMonth.getOnline());
-				}
-				
+				statement.setInt(1, getCurActivity(player, table));
+				statement.setInt(2, getCurOnline(player, table));
+				statement.setInt(3, getLastActivity(player, table));
+				statement.setInt(4, getLastOnline(player, table));		
 				statement.setString(5, player.getName());
 				
 				statement.executeUpdate();
@@ -369,5 +323,103 @@ public class ASMySql {
 	private Timestamp getCurrentTime()	{
 		return new Timestamp(System.currentTimeMillis());
 	}
+
+	public void rollover(TableType table) {
+		String queryLastActivity = "UPDATE `" + TableName(table) + "` SET `lastActivity` = `curActivity`;";
+		String queryLastOnline = "UPDATE `" + TableName(table) + "` SET `lastOnline` = `curOnline`;";
+		String queryCurActivity = "UPDATE `" + TableName(table) + "` SET `curActivity` = 0;";
+		String queryCurOnline = "UPDATE `" + TableName(table) + "` SET `curOnline` = 0;";
+		
+		Connection connection = getSQLConnection();
+		PreparedStatement statement = null;
+		
+		try {
+			statement = connection.prepareStatement(queryLastActivity);
+			statement.executeUpdate();
+			statement = connection.prepareStatement(queryLastOnline);
+			statement.executeUpdate();
+			statement = connection.prepareStatement(queryCurActivity);
+			statement.executeUpdate();
+			statement = connection.prepareStatement(queryCurOnline);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			printStackError("SQL rollover error with table " + TableName(table), e);
+		}
+	}
 	
+	private int getCurActivity(ASPlayer data, TableType table)	{
+		switch(table)	{
+		case DAY:	return data.curDay.activity;
+		case WEEK:	return data.curWeek.activity;
+		case MONTH:	return data.curMonth.activity;
+		default:	plugin.severe("Invalid Type in getCurActivity");
+		}
+		return 0;
+	}
+	
+	private int getCurOnline(ASPlayer data, TableType table)	{
+		switch(table)	{
+		case DAY:	return data.curDay.online;
+		case WEEK:	return data.curWeek.online;
+		case MONTH:	return data.curMonth.online;
+		default:	plugin.severe("Invalid Type in getCurOnline");
+		}
+		return 0;
+	}
+	
+	private int getLastActivity(ASPlayer data, TableType table)	{
+		switch(table)	{
+		case DAY:	return data.lastDay.activity;
+		case WEEK:	return data.lastWeek.activity;
+		case MONTH:	return data.lastMonth.activity;
+		default:	plugin.severe("Invalid Type in getLastActivity");
+		}
+		return 0;
+	}
+	private int getLastOnline(ASPlayer data, TableType table)	{
+		switch(table)	{
+		case DAY:	return data.lastDay.online;
+		case WEEK:	return data.lastWeek.online;
+		case MONTH:	return data.lastMonth.online;
+		default:	plugin.severe("Invalid Type in getLastOnline");
+		}
+		return 0;
+	}
+	
+	private ASPlayer setCurActivity(ASPlayer data, TableType table, int value)	{
+		switch(table)	{
+		case DAY:	data.curDay.activity = value;
+		case WEEK:	data.curWeek.activity = value;
+		case MONTH:	data.curMonth.activity = value;
+		default:	plugin.severe("Invalid Type in setCurActivity");
+		}
+		return data;
+	}
+	private ASPlayer setCurOnline(ASPlayer data, TableType table, int value)	{
+		switch(table)	{
+		case DAY:	data.curDay.online = value;
+		case WEEK:	data.curWeek.online = value;
+		case MONTH:	data.curMonth.online = value;
+		default:	plugin.severe("Invalid Type in setCurOnline");
+		}
+		return data;
+	}
+	private ASPlayer setLastActivity(ASPlayer data, TableType table, int value)	{
+		switch(table)	{
+		case DAY:	data.lastDay.activity = value;
+		case WEEK:	data.lastWeek.activity = value;
+		case MONTH:	data.lastMonth.activity = value;
+		default:	plugin.severe("Invalid Type in setLastActivity");
+		}
+		return data;
+	}
+	private ASPlayer setLastOnline(ASPlayer data, TableType table, int value)	{
+		switch(table)	{
+		case DAY:	data.lastDay.online = value;
+		case WEEK:	data.lastWeek.online = value;
+		case MONTH:	data.lastMonth.online = value;
+		default:	plugin.severe("Invalid Type in setLastOnline");
+		}
+		return data;
+	}
 }
