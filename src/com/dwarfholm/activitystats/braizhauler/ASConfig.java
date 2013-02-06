@@ -17,10 +17,14 @@ public class ASConfig {
 	public double ecoMin, ecoMax;
 	
 	
+	public String remotesqlHostname, remotesqlPort, remotesqlUsername, remotesqlPassword,
+					remotesqlDatabase, remotesqlTable, remotesqlColumn, remotesqlURI;
+	
 	public int prmWatchedRanksCount;
 	public String[] prmWatchedRanks;
 	public int[] prmMinutePlayed;
 	public String[] prmRanksTo;
+	
 	
 	public ASConfig(ActivityStats plugin)	{
 		this.plugin = plugin;
@@ -69,6 +73,15 @@ public class ASConfig {
 		ecoMin = config.getDouble("economy.min");
 		ecoMax = config.getDouble("economy.max");
 		
+		
+		remotesqlHostname = config.getString("database.mysql.hostname");
+		remotesqlPort = config.getString("database.mysql.port");
+		remotesqlUsername = config.getString("database.mysql.username");
+		remotesqlPassword = config.getString("database.mysql.password");
+		remotesqlDatabase = config.getString("database.mysql.database");
+		remotesqlTable = config.getString("database.mysql.tableprefix");
+		remotesqlColumn = config.getString("database.mysql.tableprefix");
+		remotesqlURI = "jdbc:mysql://" + remotesqlHostname + ":" + remotesqlPort  + "/" + remotesqlDatabase;
 		loadPromoterRanks();
 	}
 	
