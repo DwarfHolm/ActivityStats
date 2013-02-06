@@ -389,8 +389,11 @@ public class ASMySql {
 	private ASPlayer setCurActivity(ASPlayer data, TableType table, int value)	{
 		switch(table)	{
 		case DAY:	data.curDay.activity = value;
+			break;
 		case WEEK:	data.curWeek.activity = value;
+			break;
 		case MONTH:	data.curMonth.activity = value;
+			break;
 		default:	plugin.severe("Invalid Type in setCurActivity");
 		}
 		return data;
@@ -398,8 +401,11 @@ public class ASMySql {
 	private ASPlayer setCurOnline(ASPlayer data, TableType table, int value)	{
 		switch(table)	{
 		case DAY:	data.curDay.online = value;
+			break;
 		case WEEK:	data.curWeek.online = value;
+			break;
 		case MONTH:	data.curMonth.online = value;
+			break;
 		default:	plugin.severe("Invalid Type in setCurOnline");
 		}
 		return data;
@@ -407,8 +413,11 @@ public class ASMySql {
 	private ASPlayer setLastActivity(ASPlayer data, TableType table, int value)	{
 		switch(table)	{
 		case DAY:	data.lastDay.activity = value;
+			break;
 		case WEEK:	data.lastWeek.activity = value;
+			break;
 		case MONTH:	data.lastMonth.activity = value;
+			break;
 		default:	plugin.severe("Invalid Type in setLastActivity");
 		}
 		return data;
@@ -416,8 +425,11 @@ public class ASMySql {
 	private ASPlayer setLastOnline(ASPlayer data, TableType table, int value)	{
 		switch(table)	{
 		case DAY:	data.lastDay.online = value;
+			break;
 		case WEEK:	data.lastWeek.online = value;
+			break;
 		case MONTH:	data.lastMonth.online = value;
+			break;
 		default:	plugin.severe("Invalid Type in setLastOnline");
 		}
 		return data;
