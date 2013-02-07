@@ -3,16 +3,20 @@ package com.dwarfholm.activitystats.braizhauler;
 
 import org.bukkit.scheduler.BukkitScheduler;
 
+import com.dwarfholm.activitystats.braizhauler.ASMySQL.TableType;
+
 public class ASDatabase {
 	private ActivityStats plugin;
 	private BukkitScheduler scheduler;
-	private ASMySql mySQL;
+	private ASMySQL mySQL;
+	private ASRemoteMySQL remoteMySQL;
 	
 	public ASDatabase (ActivityStats plugin)	{
 		this.plugin = plugin;
 		this.scheduler = plugin.getServer().getScheduler();
 		
-		mySQL = new ASMySql(plugin);
+		mySQL = new ASMySQL(plugin);
+		remoteMySQL = new ASRemoteMySQL(plugin);
 	}
 	
 	public void createTables()	{
@@ -27,6 +31,8 @@ public class ASDatabase {
 	
 	public void loadPlayer(final String player)	{
 		if (plugin.config().useMySQL)	{	
+			if(mySQL.playerExists(player))
+				mySQL.createPlayer(player);
 			mySQL.loadPlayer(player);
 		}
 	}
@@ -67,5 +73,20 @@ public class ASDatabase {
 				}
 			});
 		}
+	}
+	
+	public void fetchRemotePlayerList()	{
+		String[] playerList = remoteMySQL.retrieveSQL();
+		for (String player:playerList)
+			if (!mySQL.autoPromoterPlayerExists(player))
+				mySQL.addAutoPromoteValue(player, false);
+	}
+	
+	public String[] autoPromoterUnhandledList()	{
+		return mySQL.autoPromoteList();
+	}
+	
+	public void autoPromoterHandled (String player)	{
+		mySQL.updateAutoPromoteValue(player, true);
 	}
 }

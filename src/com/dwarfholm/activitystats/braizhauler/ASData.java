@@ -23,51 +23,50 @@ public class ASData {
 	}
 	
 	public void recordOnline() {
-		plugin.info("recordOnline fired");//DEBUG
 		if (playerlist!=null && playerlist.isEmpty())	{
-			plugin.info("recordOnline has playerList");//DEBUG
 			for (ASPlayer player:playerlist.values())
 				if ( plugin.getServer().getPlayer(player.getName()) != null)
 					player.curPeriod.addOnline();
-			plugin.info("recordOnline looking for rollovers"); //DEBUG
-			if( plugin.PeriodRolloverDue())	{
-				plugin.info("Paying all Players");
-				for (ASPlayer player:playerlist.values())	{
-					plugin.info(player.getName());
-					plugin.payPlayer(player);
-				}
-				rolloverPeriod();
-				
-				if( plugin.DayRolloverDue() || plugin.WeekRolloverDue() || plugin.MonthRolloverDue() )	{
-					saveAll();
-					if ( plugin.DayRolloverDue() )
-						database.rolloverDay();
-					if ( plugin.WeekRolloverDue() )
-						database.rolloverWeek();
-					if ( plugin.MonthRolloverDue() )
-						database.rolloverMonth();
-					loadOnlinePlayers();
-				}
-				Player pPlayer;
-				for (ASPlayer player:playerlist.values())	{
-					pPlayer = plugin.getServer().getPlayer(player.getName());
-					if ( pPlayer == null )
-						playerlist.remove(player.getName());
-					else
-						plugin.autoPromoterCheck(pPlayer);
-				}
-						
-				saveAll();
-			} else {
-				plugin.info("recordOnline not rolling over");//DEBUG
-			}
-		} else	{
-			plugin.info("recordOnline failed due to empty playerlist");//debug
 		}
+		checkRollovers();
 	}
 	
 
 	
+	private void checkRollovers() {
+		if( plugin.PeriodRolloverDue())	{
+			for (ASPlayer player:playerlist.values())	{
+				plugin.info(player.getName());
+				plugin.payPlayer(player);
+			}
+			rolloverPeriod();
+			saveAll();
+			if( plugin.DayRolloverDue() || plugin.WeekRolloverDue() || plugin.MonthRolloverDue() )	{
+				if ( plugin.DayRolloverDue() )
+					database.rolloverDay();
+				if ( plugin.WeekRolloverDue() )
+					database.rolloverWeek();
+				if ( plugin.MonthRolloverDue() )
+					database.rolloverMonth();
+				loadOnlinePlayers();
+				saveAll();
+			}
+			Player pPlayer;
+			for (ASPlayer player:playerlist.values())	{
+				pPlayer = plugin.getServer().getPlayer(player.getName());
+				if ( pPlayer == null )
+					playerlist.remove(player.getName());
+				else
+					plugin.autoPromoterCheck(pPlayer);
+			}		
+			
+		} else {
+			plugin.info("recordOnline not rolling over");//DEBUG
+		}
+	}
+
+
+
 	public void loadPlayer(String player)	{
 		database.loadPlayer(player);
 	}

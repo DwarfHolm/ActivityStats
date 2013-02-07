@@ -8,11 +8,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 
-public class ASMySql {
+public class ASMySQL {
 	private ActivityStats plugin;
 	private String prefix;
-
-	public ASMySql (ActivityStats plugin)	{
+	
+	enum TableType	{
+		PLAYER, DAY, WEEK, MONTH, AUTOPROMOTE
+	}
+	public ASMySQL (ActivityStats plugin)	{
 		this.plugin = plugin;
 
 		getPrefix();
@@ -31,6 +34,8 @@ public class ASMySql {
 			tableName = "week";
 		} else if(table == TableType.MONTH)	{
 			tableName = "month";
+		} else if (table == TableType.AUTOPROMOTE) {
+			tableName = "autopromote";
 		} else { //TableType = Player
 			tableName = "player";
 		}
@@ -97,7 +102,7 @@ public class ASMySql {
 		PreparedStatement statement = null;
 		try {
 			if ( !tableExists(TableType.PLAYER) ) {
-				plugin.info("Creating DwarfHolmTax.Chests table.");
+				plugin.info("Creating ActivityStats.Player table.");
 				query = "CREATE TABLE `" + TableName(TableType.PLAYER) + "`" +
 					"(`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
 					"`player` VARCHAR(32) NOT NULL, `joined` DATETIME, `lastonline` DATETIME, " +
@@ -136,7 +141,7 @@ public class ASMySql {
 		}		
 	}
 	
-	private boolean playerExists(String playerName)	{
+	public boolean playerExists(String playerName)	{
 		boolean exists = false;
 		String query = "";
 		Connection connection = getSQLConnection();
@@ -163,15 +168,11 @@ public class ASMySql {
 	
 	public void loadPlayer(String player)	{
 		ASPlayer playerData = new ASPlayer(player);
-		if(!playerExists(player))	{
-			createPlayer(playerData);
-		}
-		
 		String playerQuery = "Select * FROM `" + TableName(TableType.PLAYER) + "` WHERE `player` LIKE ?;";
 
-		Connection connection = getSQLConnection();
 		PreparedStatement statement = null;
 		ResultSet result;
+		Connection connection = getSQLConnection();
 		try {
 		//Player Table
 			statement = connection.prepareStatement(playerQuery);
@@ -221,7 +222,8 @@ public class ASMySql {
 		return currentData;
 	}
 	
-	private void createPlayer(ASPlayer player) {
+	public void createPlayer(String playerName) {
+		ASPlayer player = new ASPlayer(playerName);
 		Connection connection = getSQLConnection();
 		PreparedStatement statement = null;
 		Timestamp curtime = getCurrentTime();
@@ -433,5 +435,144 @@ public class ASMySql {
 		default:	plugin.severe("Invalid Type in setLastOnline");
 		}
 		return data;
+	}
+	
+	public int autoPromoteUnhandledCount()	{
+		int count = 0;
+		String query = "SELECT COUNT(*) AS `playercount` FROM `" + TableName(TableType.AUTOPROMOTE) + "` WHERE `handled` = ?;";
+		PreparedStatement statement = null;
+
+		Connection connection = getSQLConnection();
+		if ( tableExists(TableType.AUTOPROMOTE) ) {
+			try	{
+				statement = connection.prepareStatement(query);
+				statement.setBoolean(1, false);
+				
+				ResultSet result = statement.executeQuery();
+				
+				if (result.next())
+					count = result.getInt("playercount");
+				statement.close();
+			connection.close();
+			} catch (SQLException e) {
+				printStackError("MySQL unhandled count error", e);
+			}
+		}
+		return count;
+	}
+	
+	public String[] autoPromoteList()	{
+		String playerQuery = "Select * FROM `" + TableName(TableType.AUTOPROMOTE) + "` WHERE `handled` = ?;";
+		String playerlist[] = new String[autoPromoteUnhandledCount()];
+		PreparedStatement statement = null;
+		ResultSet result;
+		Connection connection = getSQLConnection();
+		try {
+		//Player Table
+			statement = connection.prepareStatement(playerQuery);
+			statement.setBoolean(1, false);
+			result = statement.executeQuery();
+			
+			for(int count=0;result.next();count++)	{
+				playerlist[count] = result.getString("player");
+			}
+			statement.close();
+		} catch (SQLException e) {
+			printStackError("MySQL autoPromote list error", e);
+		}
+		return playerlist;
+	}
+	
+	public void createAutoPromoteTable()	{
+		String query = "";
+		Connection connection = getSQLConnection();
+		PreparedStatement statement = null;
+		try {
+			if ( !tableExists(TableType.AUTOPROMOTE) ) {
+				plugin.info("Creating ActivityStats.AutoPromoter table.");
+				query = "CREATE TABLE `" + TableName(TableType.AUTOPROMOTE) + "`" +
+					"(`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+					"`player` VARCHAR(32) NOT NULL, `handled` BIT(1)" +
+					") ENGINE = InnoDB;";
+				statement = connection.prepareStatement(query);
+				statement.executeUpdate();
+				statement.close();
+			}
+			connection.close();
+		} catch (SQLException e) {
+			printStackError("MySQL autopromoter creation error", e);
+		}
+	}
+	public boolean addAutoPromoteValue(String name, boolean handled)	{
+		boolean success = false;
+		String query = "";	
+		PreparedStatement statement = null;
+		query = "INSERT INTO `" + TableName(TableType.AUTOPROMOTE) + "`" +
+				"(`player`, `handled`) " +
+				" VALUES (?, ?);";
+		Connection connection = getSQLConnection();
+		try {
+			statement = connection.prepareStatement(query);
+			
+			statement.setString(1, name);
+			statement.setBoolean(2, handled);
+			
+			if (statement.executeUpdate()==1)	{
+				success=true;
+			}
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			printStackError("MySQL autopromoter creation error", e);
+		}
+		return success;
+	}
+	
+	
+	public boolean autoPromoterPlayerExists(String playerName)	{
+		boolean exists = false;
+		String query = "";
+		Connection connection = getSQLConnection();
+		PreparedStatement statement = null;
+		
+		if ( tableExists(TableType.PLAYER) ) {
+			query = "SELECT COUNT(*) AS `playercount` FROM `" + TableName(TableType.AUTOPROMOTE) + "` WHERE `player` = ?;";
+			try	{
+				statement = connection.prepareStatement(query);
+				statement.setString(1, playerName);
+				
+				ResultSet result = statement.executeQuery();
+				
+				if (result.next())
+					exists = (result.getInt("playercount") > 0);
+				statement.close();
+			connection.close();
+			} catch (SQLException e) {
+				printStackError("MySQL autopromoter player exist check error", e);
+			}
+		}
+		return exists;
+	}
+
+	public boolean updateAutoPromoteValue(String name, boolean handled) {
+		boolean success = false;
+		String query = "UPDATE `" + TableName(TableType.AUTOPROMOTE) + "`" +
+				"SET `handled`=? WHERE `player` = ?;";;
+		Connection connection = getSQLConnection();
+		PreparedStatement statement = null;
+		try {
+			statement = connection.prepareStatement(query);
+			
+			statement.setBoolean(1, handled);
+			statement.setString(2, name);
+			if (statement.executeUpdate()==1)	{
+				success=true;
+			}
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			printStackError("MySQL autopromoter update error", e);
+		}
+		return success;
 	}
 }

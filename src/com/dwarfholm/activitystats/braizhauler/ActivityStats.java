@@ -291,5 +291,7 @@ public class ActivityStats extends JavaPlugin {
 		
 	}
 	
-	
+	public void readRemoteDatabase()	{
+		//TODO
+	}
 }

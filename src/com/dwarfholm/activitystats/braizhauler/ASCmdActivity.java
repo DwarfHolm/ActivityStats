@@ -22,10 +22,10 @@ public class ASCmdActivity implements CommandExecutor {
 				}	else	{
 					plugin.msg(sender, "Must have Player argument");
 				}
-			} else {
+			} else {  // no - view self permission
 				plugin.msg(sender, plugin.getLocalization().getLackPermission("activitystats.view.self"));
 			}
-		} else	{
+		} else	{ // 1 or more args
 			plugin.msg(sender, "Unimplemented");
 		}
 		return false;

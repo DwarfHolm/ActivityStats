@@ -71,3 +71,13 @@ autopromote:
    Elf:
       minutes-played: 3000
       to-rank: GladeWarden
+   
+   mysql:
+      hostname:
+      port:
+      username:
+      password:
+      database:
+      tablename: 
+      namefield:
+      condition: 

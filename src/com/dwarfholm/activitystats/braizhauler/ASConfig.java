@@ -16,15 +16,16 @@ public class ASConfig {
 	public String ecoMode;
 	public double ecoMin, ecoMax;
 	
+	public boolean useremoteMySQL;
 	
 	public String remotesqlHostname, remotesqlPort, remotesqlUsername, remotesqlPassword,
-					remotesqlDatabase, remotesqlTable, remotesqlColumn, remotesqlURI;
+					remotesqlDatabase, remotesqlTable, remotesqlColumn, remotesqlCondition, remotesqlURI;
 	
 	public int prmWatchedRanksCount;
 	public String[] prmWatchedRanks;
 	public int[] prmMinutePlayed;
 	public String[] prmRanksTo;
-	
+
 	
 	public ASConfig(ActivityStats plugin)	{
 		this.plugin = plugin;
@@ -61,27 +62,32 @@ public class ASConfig {
 		
 		useMySQL = config.getBoolean("database.use-mysql");
 
-		sqlHostname = config.getString("database.mysql.hostname");
-		sqlPort = config.getString("database.mysql.port");
-		sqlUsername = config.getString("database.mysql.username");
-		sqlPassword = config.getString("database.mysql.password");
-		sqlDatabase = config.getString("database.mysql.database");
-		sqlPrefix = config.getString("database.mysql.tableprefix");
-		sqlURI = "jdbc:mysql://" + sqlHostname + ":" + sqlPort  + "/" + sqlDatabase;
+		if (useMySQL) {
+			sqlHostname = config.getString("database.mysql.hostname");
+			sqlPort = config.getString("database.mysql.port");
+			sqlUsername = config.getString("database.mysql.username");
+			sqlPassword = config.getString("database.mysql.password");
+			sqlDatabase = config.getString("database.mysql.database");
+			sqlPrefix = config.getString("database.mysql.tableprefix");
+			sqlURI = "jdbc:mysql://" + sqlHostname + ":" + sqlPort  + "/" + sqlDatabase;
+		}
 		
 		ecoMode = config.getString("economy.mode");
 		ecoMin = config.getDouble("economy.min");
 		ecoMax = config.getDouble("economy.max");
 		
-		
-		remotesqlHostname = config.getString("database.mysql.hostname");
-		remotesqlPort = config.getString("database.mysql.port");
-		remotesqlUsername = config.getString("database.mysql.username");
-		remotesqlPassword = config.getString("database.mysql.password");
-		remotesqlDatabase = config.getString("database.mysql.database");
-		remotesqlTable = config.getString("database.mysql.tableprefix");
-		remotesqlColumn = config.getString("database.mysql.tableprefix");
-		remotesqlURI = "jdbc:mysql://" + remotesqlHostname + ":" + remotesqlPort  + "/" + remotesqlDatabase;
+		remotesqlHostname = config.getString("autopromote.mysql.hostname");
+		useremoteMySQL = remotesqlHostname != null && remotesqlHostname != "";
+		if( useremoteMySQL )		{
+			remotesqlPort = config.getString("autopromote.mysql..port");
+			remotesqlUsername = config.getString("autopromote.mysql.username");
+			remotesqlPassword = config.getString("autopromote.mysql.password");
+			remotesqlDatabase = config.getString("autopromote.mysql.database");
+			remotesqlTable = config.getString("autopromote.mysql.tablename");
+			remotesqlColumn = config.getString("autopromote.mysql.namefield");
+			remotesqlCondition = config.getString("autopromote.mysql.condition");
+			remotesqlURI = "jdbc:mysql://" + remotesqlHostname + ":" + remotesqlPort + "/" + remotesqlDatabase;
+		}
 		loadPromoterRanks();
 	}
 	
