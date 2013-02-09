@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
+
+
 public class ASLongData extends ASShortData {
 	private static ASConfig config = null;
 	private int blockBreak;
@@ -135,7 +137,7 @@ public class ASLongData extends ASShortData {
 		return activity;
 	}
 	
-	public enum	ActivityType{
+	public static enum	ActivityType{
 		BREAK, PLACE, TRAVEL, CHAT, ANIMAL, MONSTER, PLAYER
 	}
 }

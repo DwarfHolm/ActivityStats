@@ -31,8 +31,9 @@ public class ASDatabase {
 	
 	public void loadPlayer(final String player)	{
 		if (plugin.config().useMySQL)	{	
-			if(mySQL.playerExists(player))
+			if(!mySQL.playerExists(player))	{
 				mySQL.createPlayer(player);
+			}
 			mySQL.loadPlayer(player);
 		}
 	}

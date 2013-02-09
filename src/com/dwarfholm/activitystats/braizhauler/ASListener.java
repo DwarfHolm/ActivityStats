@@ -36,16 +36,6 @@ public class ASListener implements Listener {
     public void createPlayer(PlayerJoinEvent event) {
     	plugin.loadPlayer(event.getPlayer().getName());
     }
-	
-	
-    @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
-    public void calculateTravel(CalculateTravelEvent event) {
-    	Location curLoc = event.getPlayer().getLocation();
-    	String name = event.getPlayer().getName();
-    	if (event.getPlayer().isOnline())	{
-    	   	plugin.getASPlayer(name).calculateTravel(curLoc);
-    	}
-    }
     
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
     public void playerTeleport(PlayerTeleportEvent event) {

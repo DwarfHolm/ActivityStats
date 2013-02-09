@@ -16,8 +16,6 @@ public class ASData {
 		database = new ASDatabase(plugin);
 	}
 	
-
-	
 	public void createDatabase() {
 		database.createTables();
 	}
@@ -28,12 +26,9 @@ public class ASData {
 				if ( plugin.getServer().getPlayer(player.getName()) != null)
 					player.curPeriod.addOnline();
 		}
-		checkRollovers();
 	}
 	
-
-	
-	private void checkRollovers() {
+	public void checkRollovers() {
 		if( plugin.PeriodRolloverDue())	{
 			for (ASPlayer player:playerlist.values())	{
 				plugin.info(player.getName());
@@ -54,23 +49,18 @@ public class ASData {
 			Player pPlayer;
 			for (ASPlayer player:playerlist.values())	{
 				pPlayer = plugin.getServer().getPlayer(player.getName());
-				if ( pPlayer == null )
+				if ( pPlayer == null )	{
+					plugin.info("removing " + player.getName());
 					playerlist.remove(player.getName());
-				else
+				} else
 					plugin.autoPromoterCheck(pPlayer);
-			}		
-			
-		} else {
-			plugin.info("recordOnline not rolling over");//DEBUG
+			}
 		}
 	}
-
-
 
 	public void loadPlayer(String player)	{
 		database.loadPlayer(player);
 	}
-	
 
 	public void savePlayer(String name) {
 		savePlayer(playerlist.get(name));
@@ -80,12 +70,9 @@ public class ASData {
 		database.updatePlayer(player);
 	}
 	
-	
 	public void setPlayer(ASPlayer player)	{
 		playerlist.put(player.getName(), player);
 	}
-	
-
 	
 	public ASPlayer getPlayer(String name)	{
 		return playerlist.get(name);
@@ -105,5 +92,9 @@ public class ASData {
 	public void saveAll()	{
 		for (ASPlayer player:playerlist.values())
 			database.updatePlayer(player);
+	}
+
+	public void fetchRemotePlayerlist() {
+		database.fetchRemotePlayerList();
 	}
 }

@@ -1,5 +1,6 @@
 package com.dwarfholm.activitystats.braizhauler;
 
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 public class ASPaymentTimer implements Runnable{
@@ -9,7 +10,7 @@ public class ASPaymentTimer implements Runnable{
 	
 	public ASPaymentTimer(ActivityStats parent)	{
 		plugin = parent;
-		intervalInTicks = 20 * 60 * plugin.config().iInterval; //Ticks per Second * Seconds Per minute * Minutes 
+		intervalInTicks = 20 * 60; //Ticks per Second * Seconds Per minute
 	}
 	
 	public void start()	{
@@ -21,6 +22,10 @@ public class ASPaymentTimer implements Runnable{
 	}
 	
 	public void run() {
+		for (Player player: plugin.getServer().getOnlinePlayers() )	{
+	    	plugin.getASPlayer(player.getName()).calculateTravel(player.getLocation());
+		}
 		plugin.getASPlayersList().recordOnline();
+		plugin.getASPlayersList().checkRollovers();
 	}
 }

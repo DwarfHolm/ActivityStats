@@ -115,7 +115,7 @@ public class ASMySQL {
 			connection.close();
 		} catch (SQLException e) {
 			printStackError("MySQL player creation error", e);
-		}		
+		}
 	}
 	
 	private void createRecordTable(TableType table)	{
@@ -126,8 +126,7 @@ public class ASMySQL {
 			if ( !tableExists(table) ) {
 				plugin.info("Creating ActivityStats.Activity table.");
 				query = "CREATE TABLE `" + TableName(table) + "`" +
-						"(`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
-						"`player` VARCHAR(32) NOT NULL, " +
+						"(`id` INT NOT NULL PRIMARY KEY, " +
 						"`curActivity` INT, `curOnline` INT," +
 						"`lastActivity` INT, `lastOnline` INT" +
 						") ENGINE = InnoDB;";
@@ -180,6 +179,7 @@ public class ASMySQL {
 			result = statement.executeQuery();
 			
 			if (result.next())	{
+				playerData.setDbID( result.getInt("id"));
 				playerData.total.activity = result.getInt("totalActivity");
 				playerData.total.online = result.getInt("totalOnline");
 			}
@@ -200,13 +200,13 @@ public class ASMySQL {
 	}
 	
 	private ASPlayer loadRecordTable (TableType table, ASPlayer currentData)	{
-		String query    = "Select * FROM `" + TableName(table) + "` WHERE `player` LIKE ?;";
+		String query    = "Select * FROM `" + TableName(table) + "` WHERE `id` = ?;";
 		Connection connection = getSQLConnection();
 		PreparedStatement statement = null;
 		ResultSet result;
 		try	{
 			statement = connection.prepareStatement(query);
-			statement.setString(1, currentData.getName());
+			statement.setInt(1, currentData.getDbID());
 			result = statement.executeQuery();
 			
 			if (result.next())	{
@@ -222,7 +222,59 @@ public class ASMySQL {
 		return currentData;
 	}
 	
+
+	
+	public void updatePlayer(ASPlayer player) {
+		Connection connection = getSQLConnection();
+		PreparedStatement statement = null;
+		Timestamp curtime = getCurrentTime();
+		String query = "UPDATE `" + TableName(TableType.PLAYER) + "` " +
+		"SET `lastonline` = ?, `totalActivity` = ?, `totalOnline` = ? " +
+		"WHERE `id` = ?;";
+		try {
+			statement = connection.prepareStatement(query);
+						
+			statement.setTimestamp(1, curtime);
+			statement.setInt(2, player.total.getActivity());
+			statement.setInt(3, player.total.getOnline());
+			statement.setInt(4, player.getDbID());
+			
+			statement.executeUpdate();
+			statement.close();
+		} catch (SQLException e) {
+			printStackError("MySQL update player error", e);
+		}
+		updateRecordTable(player, TableType.DAY);
+		updateRecordTable(player, TableType.WEEK);
+		updateRecordTable(player, TableType.MONTH);
+	}
+	
+	private void updateRecordTable(ASPlayer player, TableType table) {
+		Connection connection = getSQLConnection();
+		PreparedStatement statement = null;
+		if(playerExists(player.getName()))	{
+			String query = "UPDATE `" + TableName(table) + "` " +
+			"SET `curActivity` = ?, `curOnline` = ?, `lastActivity` = ?, `lastOnline` = ? " +
+			"WHERE `id` = ?;";
+			try {
+				
+				statement = connection.prepareStatement(query);
+				statement.setInt(1, getCurActivity(player, table));
+				statement.setInt(2, getCurOnline(player, table));
+				statement.setInt(3, getLastActivity(player, table));
+				statement.setInt(4, getLastOnline(player, table));		
+				statement.setInt(5, player.getDbID());
+				
+				statement.executeUpdate();
+				statement.close();
+			} catch (SQLException e) {
+				printStackError("MySQL update record error", e);
+			}
+		}
+	}
+	
 	public void createPlayer(String playerName) {
+		plugin.info("Adding " + playerName + " to database");
 		ASPlayer player = new ASPlayer(playerName);
 		Connection connection = getSQLConnection();
 		PreparedStatement statement = null;
@@ -252,16 +304,15 @@ public class ASMySQL {
 		} catch (SQLException e) {
 			printStackError("MySQL create player error", e);
 		}
-	}
-	
+	}	
 	private void createPlayerRecord(Connection connection, TableType table, ASPlayer player) throws SQLException	{	
 		String query = "INSERT INTO `" + TableName(table) + "` " +
-				"(`player`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
+				"(`id`, `curActivity`, `curOnline`, `lastActivity`, `lastOnline`) " +
 				" VALUES (?, ?, ?, ?, ?);";
 		
 		PreparedStatement statement = connection.prepareStatement(query);
 		
-		statement.setString(1, player.getName());
+		statement.setInt(1, player.getDbID());
 		statement.setInt(2, getCurActivity(player, table));
 		statement.setInt(3, getCurOnline(player, table));
 		statement.setInt(4, getLastActivity(player, table));
@@ -270,58 +321,7 @@ public class ASMySQL {
 		statement.executeUpdate();
 		statement.close();
 	}
-	
-	private void updateRecordTable(ASPlayer player, TableType table) {
-		Connection connection = getSQLConnection();
-		PreparedStatement statement = null;
-		if(playerExists(player.getName()))	{
-			String query = "UPDATE `" + TableName(table) + "` " +
-			"SET `curActivity` = ?, `curOnline` = ?, `lastActivity` = ?, `lastOnline` = ? " +
-			"WHERE `player` LIKE ?;";
-			try {
-				
-				statement = connection.prepareStatement(query);
-				statement.setInt(1, getCurActivity(player, table));
-				statement.setInt(2, getCurOnline(player, table));
-				statement.setInt(3, getLastActivity(player, table));
-				statement.setInt(4, getLastOnline(player, table));		
-				statement.setString(5, player.getName());
-				
-				statement.executeUpdate();
-				statement.close();
-			} catch (SQLException e) {
-				printStackError("MySQL update record error", e);
-			}
-		}
-	}
-	
-	public void updatePlayer(ASPlayer player) {
-		Connection connection = getSQLConnection();
-		PreparedStatement statement = null;
-		Timestamp curtime = getCurrentTime();
-		if(playerExists(player.getName()))	{
-			String query = "UPDATE `" + TableName(TableType.PLAYER) + "` " +
-			"SET `lastonline` = ?, `totalActivity` = ?, `totalOnline` = ? " +
-			"WHERE `player` LIKE ?;";
-			try {
-				statement = connection.prepareStatement(query);
-							
-				statement.setTimestamp(1, curtime);
-				statement.setInt(2, player.total.getActivity());
-				statement.setInt(3, player.total.getOnline());
-				statement.setString(4, player.getName());
-				
-				statement.executeUpdate();
-				statement.close();
-			} catch (SQLException e) {
-				printStackError("MySQL update player error", e);
-			}
-		}
-		updateRecordTable(player, TableType.DAY);
-		updateRecordTable(player, TableType.WEEK);
-		updateRecordTable(player, TableType.MONTH);
-	}
-	
+		
 	private Timestamp getCurrentTime()	{
 		return new Timestamp(System.currentTimeMillis());
 	}

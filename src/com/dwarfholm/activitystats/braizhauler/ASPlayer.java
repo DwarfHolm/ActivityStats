@@ -13,9 +13,11 @@ public class ASPlayer {
 	public ASShortData curMonth;
 	public ASShortData lastMonth;
 	public ASShortData total;
+	private int dbID;
 	
 	public ASPlayer(String name)	{
 		this.name=name;
+		setDbID(-1);
 		curPeriod = new ASLongData();
 		lastPeriod = new ASLongData();
 		curDay = new ASShortData();
@@ -62,4 +64,6 @@ public class ASPlayer {
 	public void calculateTravel(Location from, Location to) {
 		curPeriod.calculateTravel(from, to);
 	}
+	public int getDbID()	{	return dbID;	}
+	public void setDbID(int dbID)	{	this.dbID = dbID;	}
 }

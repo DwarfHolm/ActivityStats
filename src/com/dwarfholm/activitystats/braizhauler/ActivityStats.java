@@ -41,7 +41,6 @@ public class ActivityStats extends JavaPlugin {
 	private final long MILLIS_PER_WEEK = 7 * FULL_MILLIS_PER_DAY - SHORT_PADDING;
 	private final long MILLIS_PER_MONTH = 30 * FULL_MILLIS_PER_DAY - SHORT_PADDING;
 	
-	private ASTravelTimer travelTimer;
 	private ASPaymentTimer payTimer;
 	
 	private final String ROLLOVER_FILE_NAME = "data.yml";
@@ -65,7 +64,6 @@ public class ActivityStats extends JavaPlugin {
 		
 		listener = new ASListener(this);
 		
-		travelTimer = new ASTravelTimer(this);
 		payTimer = new ASPaymentTimer(this);
 		
 		
@@ -85,27 +83,22 @@ public class ActivityStats extends JavaPlugin {
 		getCommand("nextpayday").setExecutor(new ASCmdNextPayDay(this));
 		
 		listener.register();
-		travelTimer.start();
 		payTimer.start();
 
 		info("ActivityStats Enabled");
 	}
 	
 	public void onDisable() {
+		saveRollovers();
 		listener.unregister();
 		getCommand("activitystats").setExecutor(null);
 		getCommand("activity").setExecutor(null);
 		getCommand("nextpayday").setExecutor(null);
 
 		payTimer.stop();
-		travelTimer.stop();
 		
 		vault.disconnect();
 	}
-	
-	
-	
-	
 	
 	public void loadPlayer(String name)	{	players.loadPlayer(name);	}
 	public void savePlayer(String name)	{	players.savePlayer(name);	}
@@ -292,6 +285,6 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public void readRemoteDatabase()	{
-		//TODO
+		players.fetchRemotePlayerlist();
 	}
 }

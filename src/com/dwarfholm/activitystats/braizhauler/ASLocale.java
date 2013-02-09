@@ -51,7 +51,7 @@ public class ASLocale {
 		termPlayer  = locale.getString("term.player");
 		termActivity= locale.getString("term.activity");
 		
-		msgPayment = locale.getString("message.payment").replaceAll("%","%%").replaceAll("\\?", "%s");
+		msgPayment = locale.getString("message.payment").replaceAll("%","%%").replaceAll("\\?", "%s").replaceFirst("\\?", "%.2f");
 		msgActivityReport = locale.getString("message.activity-report").replaceAll("%","%%").replaceFirst("\\?", "%.2f").replaceFirst("\\?", "%s");
 		msgActivityDetail = locale.getString("message.activity-detail").replaceAll("%","%%").replaceFirst("\\?", "%d").replaceFirst("\\?", "%s");
 		msgTimeToPay = locale.getString("message.time-til-payment").replaceAll("%","%%").replaceFirst("\\?", "%d");
