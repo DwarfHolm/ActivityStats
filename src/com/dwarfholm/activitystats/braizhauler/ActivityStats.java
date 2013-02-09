@@ -150,6 +150,7 @@ public class ActivityStats extends JavaPlugin {
 	public void rolledoverPeriod()	{
 		lastPeriodRollover.setTime(System.currentTimeMillis());
 		saveRollovers();
+		fetchRemoteDatabase();
 	}
 	public void rolledoverDay()	{
 		lastDayRollover.setTime(System.currentTimeMillis());
@@ -256,7 +257,6 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public double getActivityPercent (ASPlayer player)	{
-		info("Player = " + player.getName() + " " + String.valueOf(player.getActivity()) + "/" + String.valueOf(config.iQuota));
 		return Math.max(0.0, Math.min( 1.0, ((double)player.getActivity()) / ((double)config.iQuota)));
 	}
 	public double getBooleanPayment(ASPlayer player)	{
@@ -284,7 +284,7 @@ public class ActivityStats extends JavaPlugin {
 		
 	}
 	
-	public void readRemoteDatabase()	{
+	public void fetchRemoteDatabase()	{
 		players.fetchRemotePlayerlist();
 	}
 }

@@ -14,7 +14,6 @@ public class ASCmdActivityStats implements CommandExecutor  {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		plugin.info("Attempting to run " + label + " for " + sender.getName()); 
 		if (command.getName().equalsIgnoreCase("activitystats"))	{
 			if (args.length == 0)	{
 				if (plugin.perms().has(sender, "activitystats.view.self"))	{

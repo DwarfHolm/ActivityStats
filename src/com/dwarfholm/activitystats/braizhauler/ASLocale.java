@@ -60,7 +60,7 @@ public class ASLocale {
 	}
 
 	public String getPaymentMessage(double amount, double percent)	{
-		percent = (float)(100 * percent);
+		percent = (float)((int)(10000 * percent)/100);
 		return String.format(msgPayment, plugin.econ().format(amount),percent);
 	}
 

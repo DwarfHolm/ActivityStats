@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -58,6 +59,11 @@ public class ASListener implements Listener {
     
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
     public void playerChat(AsyncPlayerChatEvent event)	{
+    	plugin.getASPlayer(event.getPlayer().getName()).curPeriod.chat();  	
+    }
+    
+    @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
+    public void playerChat(PlayerCommandPreprocessEvent event)	{
     	plugin.getASPlayer(event.getPlayer().getName()).curPeriod.chat();  	
     }
     
