@@ -89,6 +89,7 @@ public class ActivityStats extends JavaPlugin {
 	}
 	
 	public void onDisable() {
+		players.checkRollovers();
 		saveRollovers();
 		listener.unregister();
 		getCommand("activitystats").setExecutor(null);
@@ -213,7 +214,7 @@ public class ActivityStats extends JavaPlugin {
     	
 
 	public int timeToPay()	{
-		return (int)(( lastPeriodRollover.getTime()-System.currentTimeMillis() ) / MILLIS_PER_MINUTE + config.iInterval );
+		return Math.min(0,(int)(( lastPeriodRollover.getTime()-System.currentTimeMillis() ) / MILLIS_PER_MINUTE + config.iInterval ));
 	}
 	
     public void saveDefaultConfig() {
@@ -248,12 +249,14 @@ public class ActivityStats extends JavaPlugin {
 		} else	{ 
 			return;
 		}
-		msg(getServer().getPlayer(player.getName()), locale.getPaymentMessage(amount, percent));
+		Player target = getServer().getPlayer(player.getName());
+		if( target != null)
+			msg(target, locale.getPaymentMessage(amount, percent));
 		vault.econ.depositPlayer(player.getName() , amount);
 	}
 	
 	public double getPercentPayment(ASPlayer player)	{
-		return config.ecoMin + ( config.ecoMax - config.ecoMin ) * getActivityPercent(player) ;
+		return Math.floor(100*(config.ecoMin + ( config.ecoMax - config.ecoMin ) * getActivityPercent(player)))/100;
 	}
 	
 	public double getActivityPercent (ASPlayer player)	{

@@ -9,14 +9,14 @@ public class ASDatabase {
 	private ActivityStats plugin;
 	private BukkitScheduler scheduler;
 	private ASMySQL mySQL;
-	private ASRemoteMySQL remoteMySQL;
+//	private ASRemoteMySQL remoteMySQL;
 	
 	public ASDatabase (ActivityStats plugin)	{
 		this.plugin = plugin;
 		this.scheduler = plugin.getServer().getScheduler();
 		
 		mySQL = new ASMySQL(plugin);
-		remoteMySQL = new ASRemoteMySQL(plugin);
+//		remoteMySQL = new ASRemoteMySQL(plugin);
 	}
 	
 	public void createTables()	{
@@ -77,11 +77,17 @@ public class ASDatabase {
 	}
 	
 	public void fetchRemotePlayerList()	{
-		String[] playerList = remoteMySQL.retrieveSQL();
-		for (String player:playerList)
-			if (!mySQL.autoPromoterPlayerExists(player))
-				mySQL.addAutoPromoteValue(player, false);
-	}
+/*		if (plugin.config().useMySQL)	{	
+ *			scheduler.runTaskAsynchronously( plugin, new Runnable() {
+ *				public void run() {
+ *					String[] playerList = remoteMySQL.retrievePlayerList();
+ *					for (String player:playerList)
+ *						if (!mySQL.autoPromoterPlayerExists(player))
+ *							mySQL.addAutoPromoteValue(player, false);
+ *				}
+ *			});
+ *		}
+ */	}
 	
 	public String[] autoPromoterUnhandledList()	{
 		return mySQL.autoPromoteList();

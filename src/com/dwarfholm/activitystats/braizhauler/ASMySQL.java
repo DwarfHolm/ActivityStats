@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 
 
@@ -94,6 +95,7 @@ public class ASMySQL {
 		createRecordTable(TableType.DAY);
 		createRecordTable(TableType.WEEK);
 		createRecordTable(TableType.MONTH);
+		createAutoPromoteTable();
 	}
    
 	private void createPlayerTable()	{
@@ -285,7 +287,7 @@ public class ASMySQL {
 						" VALUES (?, ?, ?, ?, ?);";
 		try {
 		//Player Table
-			statement = connection.prepareStatement(query);
+			statement = connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
 			
 			statement.setString(1, player.getName());
 			statement.setTimestamp(2, curtime);
@@ -294,13 +296,17 @@ public class ASMySQL {
 			statement.setInt(5, player.total.getOnline());
 			
 			statement.executeUpdate();
-			statement.close();
-		//Day record
-			createPlayerRecord(connection, TableType.DAY, player);
-		//Week record
-			createPlayerRecord(connection, TableType.WEEK, player);
-		//Month record
-			createPlayerRecord(connection, TableType.MONTH, player);
+			ResultSet rs = statement.getGeneratedKeys();
+		    if (rs.next())	{
+		    	player.setDbID( rs.getInt(1));
+				statement.close();
+			//Day record
+				createPlayerRecord(connection, TableType.DAY, player);
+			//Week record
+				createPlayerRecord(connection, TableType.WEEK, player);
+			//Month record
+				createPlayerRecord(connection, TableType.MONTH, player);
+		    }
 		} catch (SQLException e) {
 			printStackError("MySQL create player error", e);
 		}

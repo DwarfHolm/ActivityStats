@@ -24,6 +24,9 @@ public class ASRemoteMySQL {
 	}
 
 	private Connection getRemoteSQLConnection() {
+		plugin.info(plugin.config().remotesqlURI);
+		plugin.info(plugin.config().remotesqlUsername);
+		plugin.info(plugin.config().remotesqlPassword);
 		try {
 			Connection connection;
 			
@@ -45,7 +48,7 @@ public class ASRemoteMySQL {
 			plugin.severe(trace.toString());
 	}
 	
-	public String[] retrieveSQL()	{
+	public String[] retrievePlayerList()	{
 		String column = plugin.config().remotesqlColumn;
 		int rowCount = 0;
 		String[] playerlist = null;
@@ -54,27 +57,34 @@ public class ASRemoteMySQL {
 		PreparedStatement statement = null;
 		ResultSet result = null;
 		Connection connection = getRemoteSQLConnection();
-		try {
-			statement = connection.prepareStatement(countQuery);
-			result = statement.executeQuery();
-			if (result.next())
-				rowCount = result.getInt("playercount");
-			if (rowCount > 0)	{
-				statement = connection.prepareStatement(listQuery);
-				result = statement.executeQuery();
-				playerlist = new String [rowCount];
-			}
-			while(result.next())	{
-				playerlist[--rowCount] = result.getString(column);
-			}
-					
-			result.close();
-			statement.close();
-			connection.close();
 
-		} catch (SQLException e) {
-			printStackError("MySQL Table Error Error", e);
+		plugin.info(countQuery);
+		plugin.info(listQuery);
+		if (connection != null)	{
+			try {
+				statement = connection.prepareStatement(countQuery);
+				result = statement.executeQuery();
+				if (result.next())
+					rowCount = result.getInt("playercount");
+				if (rowCount > 0)	{
+					statement = connection.prepareStatement(listQuery);
+					result = statement.executeQuery();
+					playerlist = new String [rowCount];
+				}
+				while(result.next())	{
+					playerlist[--rowCount] = result.getString(column);
+				}
+						
+				result.close();
+				statement.close();
+				connection.close();
+	
+			} catch (SQLException e) {
+				printStackError("MySQL Table Error Error", e);
+			}
+			return playerlist;
+		} else {
+			return null;
 		}
-		return playerlist;
 	}
 }

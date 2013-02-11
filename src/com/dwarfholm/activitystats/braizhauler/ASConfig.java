@@ -69,7 +69,7 @@ public class ASConfig {
 			sqlPassword = config.getString("database.mysql.password");
 			sqlDatabase = config.getString("database.mysql.database");
 			sqlPrefix = config.getString("database.mysql.tableprefix");
-			sqlURI = "jdbc:mysql://" + sqlHostname + ":" + sqlPort  + "/" + sqlDatabase;
+			sqlURI = constructURI(sqlHostname, sqlPort, sqlDatabase);
 		}
 		
 		ecoMode = config.getString("economy.mode");
@@ -86,10 +86,19 @@ public class ASConfig {
 			remotesqlTable = config.getString("autopromote.mysql.tablename");
 			remotesqlColumn = config.getString("autopromote.mysql.namefield");
 			remotesqlCondition = config.getString("autopromote.mysql.condition");
-			remotesqlURI = "jdbc:mysql://" + remotesqlHostname + ":" + remotesqlPort + "/" + remotesqlDatabase;
+			remotesqlURI = constructURI(remotesqlHostname, remotesqlPort, remotesqlDatabase);
 		}
 		loadPromoterRanks();
 	}
+	
+	private String constructURI	(String host, String port, String db)	{
+		if (port == null || port == "") {
+			return "jdbc:mysql://" + host + "/" + db;
+		} else 	{
+			return "jdbc:mysql://" + host + ":" + port + "/" + db;
+		}
+	}
+	
 	
 	private void loadPromoterRanks()	{
 		prmWatchedRanks = parseRankList(config.getString("autopromote.ranks-promoted"));
