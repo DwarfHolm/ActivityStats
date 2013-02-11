@@ -103,13 +103,20 @@ public class ASLongData extends ASShortData {
 		activity = Math.min(config.iQuota, blockBreak + blockPlace + traveled + chat + damAnimal + damMonster + damPlayer);
 	}
 
-	public void calculateTravel(Location newLoc) {
+	public void calculateTravel(Location newLoc) throws java.lang.IllegalArgumentException {
 		calculateTravel(newLoc, newLoc);
 	}
-	public void calculateTravel(Location from, Location to) {
+	public void calculateTravel(Location from, Location to) throws java.lang.IllegalArgumentException {
 		double dist = 0;
-		if (curLoc!=null) 
-			dist = curLoc.distance(from);
+		if (curLoc!=null) {
+			try {
+				dist = curLoc.distance(from);
+			}
+			catch (java.lang.IllegalArgumentException e)	{
+				curLoc = to;
+				throw e;
+			}
+		}
 		travel((int)(dist / 10 * config.iTravelMult));
 		curLoc = to;
 	}
@@ -137,6 +144,10 @@ public class ASLongData extends ASShortData {
 		return activity;
 	}
 	
+	public void setLocation(Location loc) {
+		this.curLoc = loc;
+	}
+
 	public static enum	ActivityType{
 		BREAK, PLACE, TRAVEL, CHAT, ANIMAL, MONSTER, PLAYER
 	}

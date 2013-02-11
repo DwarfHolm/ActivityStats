@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -43,7 +44,26 @@ public class ASListener implements Listener {
     	Location to = event.getTo();
     	Location from = event.getFrom();
     	String name = event.getPlayer().getName();
-    	plugin.getASPlayer(name).curPeriod.calculateTravel(from, to); 
+    	try	{
+    		plugin.getASPlayer(name).curPeriod.calculateTravel(from, to);
+	    } catch (java.lang.IllegalArgumentException e)	{
+			plugin.warning("Error while calculationg " + name + "'s travel.");
+			plugin.warning(e.getMessage());
+		}
+    }
+
+    @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
+    public void playerRespawn(PlayerRespawnEvent event)	{
+    	String name = event.getPlayer().getName();
+    	Location deathLoc = event.getPlayer().getLocation();
+    	Location respawnLoc = event.getRespawnLocation();
+    	try	{
+    		plugin.getASPlayer(name).calculateTravel(deathLoc, respawnLoc);
+	    } catch (java.lang.IllegalArgumentException e)	{
+			plugin.warning("Error while calculationg " + name + "'s travel.");
+			plugin.warning(e.getMessage());
+		}
+    	event.getRespawnLocation();
     }
     
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)

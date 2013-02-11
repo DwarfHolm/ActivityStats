@@ -58,11 +58,14 @@ public class ASPlayer {
 	public int getActivity()	{
 		return curPeriod.getActivity();
 	}
-	public void calculateTravel(Location newLoc) {
+	public void calculateTravel(Location newLoc) throws java.lang.IllegalArgumentException {
 		curPeriod.calculateTravel(newLoc);
 	}
-	public void calculateTravel(Location from, Location to) {
+	public void calculateTravel(Location from, Location to) throws java.lang.IllegalArgumentException {
 		curPeriod.calculateTravel(from, to);
+	}
+	public void setLocation	(Location loc) {
+		curPeriod.setLocation(loc);
 	}
 	public int getDbID()	{	return dbID;	}
 	public void setDbID(int dbID)	{	this.dbID = dbID;	}

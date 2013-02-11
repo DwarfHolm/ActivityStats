@@ -23,7 +23,12 @@ public class ASPaymentTimer implements Runnable{
 	
 	public void run() {
 		for (Player player: plugin.getServer().getOnlinePlayers() )	{
-	    	plugin.getASPlayer(player.getName()).calculateTravel(player.getLocation());
+	    	try {
+	    		plugin.getASPlayer(player.getName()).calculateTravel(player.getLocation());
+	    	} catch (java.lang.IllegalArgumentException e)	{
+	    		plugin.warning("Error while calculationg " +player.getName() + "'s travel.");
+	    		plugin.warning(e.getMessage());
+	    	}
 		}
 		plugin.getASPlayersList().recordOnline();
 		plugin.getASPlayersList().checkRollovers();
