@@ -17,6 +17,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
+import com.dthielke.herochat.ChannelChatEvent;
+
 public class ASListener implements Listener {
 	ActivityStats plugin;
 	
@@ -85,6 +87,12 @@ public class ASListener implements Listener {
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
     public void playerChat(PlayerCommandPreprocessEvent event)	{
     	plugin.getASPlayer(event.getPlayer().getName()).curPeriod.chat();  	
+    }
+    
+    
+    @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
+    public void playerChat(ChannelChatEvent event)	{
+    	plugin.getASPlayer(event.getSender().getName()).curPeriod.chat();  	
     }
     
     @EventHandler (priority =  EventPriority.MONITOR, ignoreCancelled = true)
