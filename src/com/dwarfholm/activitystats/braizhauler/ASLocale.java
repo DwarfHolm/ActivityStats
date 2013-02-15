@@ -70,7 +70,7 @@ public class ASLocale {
 	}
 	
 	public String[] getLongActivityReportMessage(ASPlayer target) {
-		String[] report = new String[8];
+		String[] report = new String[9];
 		report[0] = String.format(msgActivityDetail, target.curPeriod.getActivity(ActivityType.BREAK), getTerm(ActivityType.BREAK));
 		report[1] = String.format(msgActivityDetail, target.curPeriod.getActivity(ActivityType.PLACE), getTerm(ActivityType.PLACE));
 		report[2] = String.format(msgActivityDetail, target.curPeriod.getActivity(ActivityType.TRAVEL), getTerm(ActivityType.TRAVEL));
@@ -78,7 +78,8 @@ public class ASLocale {
 		report[4] = String.format(msgActivityDetail, target.curPeriod.getActivity(ActivityType.ANIMAL), getTerm(ActivityType.ANIMAL));
 		report[5] = String.format(msgActivityDetail, target.curPeriod.getActivity(ActivityType.MONSTER), getTerm(ActivityType.MONSTER));
 		report[6] = String.format(msgActivityDetail, target.curPeriod.getActivity(ActivityType.PLAYER), getTerm(ActivityType.PLAYER));
-		report[7] = getActivityReportMessage(target);
+		report[7] = String.format(msgActivityDetail, target.curPeriod.getOnline(), "Online");
+		report[8] = getActivityReportMessage(target);
 		return report;
 	}
 	

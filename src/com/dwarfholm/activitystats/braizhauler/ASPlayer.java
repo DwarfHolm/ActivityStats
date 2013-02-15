@@ -30,10 +30,10 @@ public class ASPlayer {
 	}
 	
 	public void rolloverPeriod()	{
-		curDay.add(lastPeriod);
-		curWeek.add(lastPeriod);
-		curMonth.add(lastPeriod);
-		total.add(lastPeriod);
+		curDay.add(curPeriod);
+		curWeek.add(curPeriod);
+		curMonth.add(curPeriod);
+		total.add(curPeriod);
 		lastPeriod.setEqual(curPeriod);
 		curPeriod.clear();
 	}

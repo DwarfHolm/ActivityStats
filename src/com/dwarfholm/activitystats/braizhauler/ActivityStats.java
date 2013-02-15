@@ -214,7 +214,7 @@ public class ActivityStats extends JavaPlugin {
     	
 
 	public int timeToPay()	{
-		return Math.min(0,(int)(( lastPeriodRollover.getTime()-System.currentTimeMillis() ) / MILLIS_PER_MINUTE + config.iInterval ));
+		return Math.max(0,(int)(( lastPeriodRollover.getTime()-System.currentTimeMillis() ) / MILLIS_PER_MINUTE + config.iInterval ));
 	}
 	
     public void saveDefaultConfig() {

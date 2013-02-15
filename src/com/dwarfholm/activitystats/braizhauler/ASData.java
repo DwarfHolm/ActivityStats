@@ -21,22 +21,25 @@ public class ASData {
 	}
 	
 	public void recordOnline() {
-		if (playerlist!=null && playerlist.isEmpty())	{
-			for (ASPlayer player:playerlist.values())
-				if ( plugin.getServer().getPlayer(player.getName()) != null)
+		if (playerlist!=null && !playerlist.isEmpty())	{
+			for (ASPlayer player:playerlist.values())	{
+				if ( plugin.getServer().getPlayer(player.getName()) != null)	{
 					player.curPeriod.addOnline();
+					plugin.info(player.getName() + " Online");
+				}
+			}
 		}
 	}
 	
 	public void checkRollovers() {
 		if( plugin.PeriodRolloverDue())	{
-			for (ASPlayer player:playerlist.values())	{
-				plugin.info(player.getName());
-				plugin.payPlayer(player);
+			for (String sPlayer:playerlist.keySet())	{
+				plugin.info("paying " + sPlayer);
+				plugin.payPlayer(playerlist.get(sPlayer));
 			}
-			rolloverPeriod();
-			saveAll();
+			
 			if( plugin.DayRolloverDue() || plugin.WeekRolloverDue() || plugin.MonthRolloverDue() )	{
+				saveAll();
 				if ( plugin.DayRolloverDue() )
 					database.rolloverDay();
 				if ( plugin.WeekRolloverDue() )
@@ -44,8 +47,9 @@ public class ASData {
 				if ( plugin.MonthRolloverDue() )
 					database.rolloverMonth();
 				loadOnlinePlayers();
-				saveAll();
 			}
+			rolloverPeriod();
+			saveAll();
 			Player pPlayer;
 			for (ASPlayer player:playerlist.values())	{
 				pPlayer = plugin.getServer().getPlayer(player.getName());
@@ -55,6 +59,7 @@ public class ASData {
 				} else
 					plugin.autoPromoterCheck(pPlayer);
 			}
+			
 		}
 	}
 

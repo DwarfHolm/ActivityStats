@@ -17,6 +17,7 @@ public class ASShortData {
 	}
 	public int getActivity()	{	return activity;	}
 	public int getOnline()		{	return online;	}
+	
 	public void add(ASShortData other)	{
 		activity = activity + other.activity;
 		online = online + other.online;
